@@ -1,5 +1,11 @@
-﻿using FarmsAPI.DTO;
+﻿using AutoMapper;
+using FarmsAPI.DbContexts;
+using FarmsAPI.DTO;
 using FarmsAPI.Models;
+using FarmsAPI.Validations;
+using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,80 +16,149 @@ namespace FarmsAPI.Controllers;
 public class HerdController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly IValidator<Herd> _validator;
+    private readonly IMapper _mapper;
 
-    public HerdController(ApplicationDbContext context)
+    public HerdController(ApplicationDbContext context, IValidator<Herd> validator, IMapper mapper)
     {
         _context = context;
+        _validator = validator;
+        _mapper = mapper;
     }
 
     [HttpGet("{id}")]
-    public async Task GetHerdDetails(int id)
+    [ProducesResponseType(typeof(HerdDto), 200)]
+    [ProducesResponseType(typeof(ProblemDetails), 404)]
+    public async Task<IActionResult> GetHerdDetails(int id)
     {
-        Herd? result = await _context.Herds.FirstOrDefaultAsync(h => h.Id == id);
+        Herd? herdFound = await _context.Herds.FindAsync(id);
+
+        if (herdFound == null)
+        {
+            ProblemDetails problemDetails = new ProblemDetails
+            {
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
+                Title = "Record not found.",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"The herd with ID {id} does not exist."
+            };
+
+            return NotFound(problemDetails);
+        }
+
+        HerdDto dtoToReturn = _mapper.Map<HerdDto>(herdFound);
+
+        return Ok(dtoToReturn);
     }
 
     [HttpGet(Name = "GetHerds")]
-    public async Task GetHerds([FromQuery] object searchOptions)
+    public async Task<IActionResult> GetHerds([FromQuery] object searchOptions)
     {
-
+        return Ok(_context.Herds.ToList());
     }
 
     [HttpPost(Name = "CreateHerd")]
-    public async Task<IActionResult> CreateHerd(HerdDto herdDto)
+    [ProducesResponseType(typeof(HerdDto), 201)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
+    [ResponseCache(NoStore = true)]
+    public async Task<IActionResult> CreateHerd(CreateHerdDto dtoReceived)
     {
-        if (string.IsNullOrEmpty(herdDto.Name))
+        Herd herdToCreate = _mapper.Map<Herd>(dtoReceived);
+        herdToCreate.DateCreated = DateTime.Now;
+
+        ValidationResult result = await _validator.ValidateAsync(herdToCreate);
+
+        if (!result.IsValid)
         {
-            return BadRequest("Name is required.");
+            result.AddToModelState(ModelState);
+
+            ValidationProblemDetails details = new ValidationProblemDetails(ModelState)
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1"
+            };
+
+            return BadRequest(details);
         }
 
-        var newHerd = new Herd()
-        {
-            Name = herdDto.Name,
-            Address = herdDto.Address,
-            City = herdDto.City,
-            Region = herdDto.Region,
-            Country = herdDto.Country,
-            DateCreated = DateTime.Now
-        };
-
-        await _context.AddAsync(newHerd);
+        await _context.AddAsync(herdToCreate);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("someName", new { id = herdDto.Id }, herdDto);
+        HerdDto dtoToReturn = _mapper.Map<HerdDto>(herdToCreate);
+
+        return CreatedAtAction("GetHerdDetails", new { id = dtoToReturn.Id }, dtoToReturn);
     }
 
-
     [HttpPut(Name = "UpdateHerd")]
-    public async Task UpdateHerd(HerdDto herdDto)
+    [ProducesResponseType(typeof(HerdDto), 200)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
+    [ProducesResponseType(typeof(ProblemDetails), 404)]
+    [ResponseCache(NoStore = true)]
+    public async Task<IActionResult> UpdateHerd(HerdDto dtoReceived)
     {
-        var herdToUpdate = await _context.Herds.FirstOrDefaultAsync(h => h.Id == herdDto.Id);
+        Herd? herdToUpdate = await _context.Herds.FindAsync(dtoReceived.Id);
 
-        if (herdToUpdate != null)
+        if (herdToUpdate == null)
         {
-            if (!string.IsNullOrEmpty(herdDto.Name))
-                herdToUpdate.Name = herdDto.Name;
+            ProblemDetails problemDetails = new ProblemDetails
+            {
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
+                Title = "Record not found.",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"The herd with ID {dtoReceived.Id} does not exist."
+            };
 
-            herdToUpdate.Address = herdDto.Address;
-            herdToUpdate.City = herdDto.City;
-            herdToUpdate.Region = herdDto.Region;
-            herdToUpdate.Country = herdDto.Country;
-
-            herdToUpdate.DateUpdated = DateTime.Now;
-
-            _context.Update(herdToUpdate);
-            await _context.SaveChangesAsync();
+            return NotFound(problemDetails);
         }
+
+        _mapper.Map(dtoReceived, herdToUpdate, typeof(HerdDto), typeof(Herd));
+        herdToUpdate.DateUpdated = DateTime.Now;
+
+        ValidationResult result = await _validator.ValidateAsync(herdToUpdate);
+
+        if (!result.IsValid)
+        {
+            result.AddToModelState(ModelState);
+
+            ValidationProblemDetails details = new ValidationProblemDetails(ModelState)
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1"
+            };
+
+            return BadRequest(details);
+        }
+
+        _context.Update(herdToUpdate);
+        await _context.SaveChangesAsync();
+
+        return Ok(dtoReceived);
     }
 
     [HttpDelete(Name = "DeleteHerd")]
-    public async Task DeleteHerd(int id)
+    [ProducesResponseType(typeof(NoContent), 204)]
+    [ProducesResponseType(typeof(ProblemDetails), 404)]
+    [ResponseCache(NoStore = true)]
+    public async Task<IActionResult> DeleteHerd(int id)
     {
-        var herdToDelete = await _context.Herds.FirstOrDefaultAsync(h => h.Id == id);
+        Herd? herdToDelete = await _context.Herds.FindAsync(id);
 
-        if (herdToDelete != null)
+        if (herdToDelete == null)
         {
-            _context.Herds.Remove(herdToDelete);
-            await _context.SaveChangesAsync();
+            ProblemDetails problemDetails = new ProblemDetails
+            {
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
+                Title = "Record not found.",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"The herd with ID {id} does not exist."
+            };
+
+            return NotFound(problemDetails);
         }
+
+        _context.Herds.Remove(herdToDelete);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
     }
 }

@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FarmsAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace FarmsAPI.Models;
+namespace FarmsAPI.DbContexts;
 
 public class ApplicationDbContext : DbContext
 {
@@ -22,6 +23,6 @@ public class ApplicationDbContext : DbContext
         builder.Entity<Herd>().Property(h => h.Region).HasMaxLength(50);
         builder.Entity<Herd>().Property(h => h.Country).HasMaxLength(50);
         builder.Entity<Herd>().Property(h => h.DateCreated).IsRequired();
-        builder.Entity<Herd>().Property(h => h.DateUpdated).IsRequired();
+        //builder.Entity<Herd>().Property(h => h.DateUpdated).IsRequired();
     }
 }
