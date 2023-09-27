@@ -4,7 +4,6 @@ using FarmsAPI.Validations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Serilog.Exceptions;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,9 +14,7 @@ builder.Logging.ClearProviders();
 
 builder.Host.UseSerilog((context, loggerConfig) =>
 {
-    loggerConfig.WriteTo.Console();
-    //loggerConfig.WriteTo.Seq("http://localhost:5341");
-    loggerConfig.Enrich.WithExceptionDetails();
+    loggerConfig.ReadFrom.Configuration(builder.Configuration);
 });
 
 builder.Services.AddControllers();
