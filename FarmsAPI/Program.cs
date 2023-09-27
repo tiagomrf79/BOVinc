@@ -17,7 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration["ConnectionStrings:Farms"])
+    opt.UseSqlServer(builder.Configuration["ConnectionStrings:HerdsDB"])
 );
 
 builder.Services.AddScoped<IValidator<Herd>, HerdValidator>();

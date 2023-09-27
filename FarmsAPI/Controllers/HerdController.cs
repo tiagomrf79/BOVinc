@@ -5,9 +5,11 @@ using FarmsAPI.Models;
 using FarmsAPI.Validations;
 using FluentValidation;
 using FluentValidation.Results;
+using HerdsAPI.DTO;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace FarmsAPI.Controllers;
 
@@ -29,7 +31,7 @@ public class HerdController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(HerdDto), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 404)]
-    public async Task<IActionResult> GetHerdDetails(int id)
+    public async Task<IActionResult> GetHerd(int id)
     {
         Herd? herdFound = await _context.Herds.FindAsync(id);
 
@@ -51,10 +53,25 @@ public class HerdController : ControllerBase
         return Ok(dtoToReturn);
     }
 
-    [HttpGet(Name = "GetHerds")]
-    public async Task<IActionResult> GetHerds([FromQuery] object searchOptions)
+    [HttpGet(Name = "SearchHerds")]
+    [ProducesResponseType(typeof(List<HerdDto>), 200)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
+    public async Task<IActionResult> SearchHerds([FromQuery] SearchQueryDto<HerdDto> searchOptions)
     {
-        return Ok(_context.Herds.ToList());
+        IQueryable<Herd> query = _context.Herds.AsQueryable();
+        
+        if (!string.IsNullOrEmpty(searchOptions.FilterQuery))
+            query = query.Where(h => h.Name.Contains(searchOptions.FilterQuery));
+
+        query = query
+            .OrderBy($"{searchOptions.SortColumn} {searchOptions.SortOrder}")
+            .Skip(searchOptions.PageIndex * searchOptions.PageSize)
+            .Take(searchOptions.PageSize);
+
+        List<Herd> herdsList = await query.ToListAsync();
+        List<HerdDto> listToReturn = _mapper.Map<List<HerdDto>>(herdsList);
+        
+        return Ok(listToReturn);
     }
 
     [HttpPost(Name = "CreateHerd")]
@@ -86,7 +103,7 @@ public class HerdController : ControllerBase
 
         HerdDto dtoToReturn = _mapper.Map<HerdDto>(herdToCreate);
 
-        return CreatedAtAction("GetHerdDetails", new { id = dtoToReturn.Id }, dtoToReturn);
+        return CreatedAtAction(nameof(GetHerd), new { id = dtoToReturn.Id }, dtoToReturn);
     }
 
     [HttpPut(Name = "UpdateHerd")]

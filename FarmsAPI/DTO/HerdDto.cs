@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace FarmsAPI.DTO;
+﻿namespace FarmsAPI.DTO;
 
 public class HerdDto
 {
