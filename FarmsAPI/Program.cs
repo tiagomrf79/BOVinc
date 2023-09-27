@@ -3,11 +3,22 @@ using FarmsAPI.Models;
 using FarmsAPI.Validations;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Exceptions;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Logging.ClearProviders();
+
+builder.Host.UseSerilog((context, loggerConfig) =>
+{
+    loggerConfig.WriteTo.Console();
+    //loggerConfig.WriteTo.Seq("http://localhost:5341");
+    loggerConfig.Enrich.WithExceptionDetails();
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
