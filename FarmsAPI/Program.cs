@@ -1,7 +1,7 @@
-using FarmsAPI.DbContexts;
-using FarmsAPI.Models;
-using FarmsAPI.Validations;
 using FluentValidation;
+using HerdsAPI.DbContexts;
+using HerdsAPI.Models;
+using HerdsAPI.Validations;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Exceptions;
@@ -23,6 +23,8 @@ builder.Host.UseSerilog((context, loggerConfig) =>
         .Enrich.WithExceptionDetails()
         .Enrich.WithProperty("Assembly", $"{Assembly.GetExecutingAssembly().GetName().Name}");
 });
+
+
 
 builder.Services.AddCors((options) =>
 {
@@ -48,12 +50,25 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration["ConnectionStrings:HerdsDB"])
-);
+{
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("HerdsDatabase"));
+});
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 builder.Services.AddScoped<IValidator<Herd>, HerdValidator>();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddDistributedMemoryCache();
+}
+else
+{
+    builder.Services.AddDistributedRedisCache(option =>
+    {
+        option.Configuration = builder.Configuration.GetConnectionString("RedisCache");
+    });
+}
 
 var app = builder.Build();
 

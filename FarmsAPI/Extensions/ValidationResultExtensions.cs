@@ -1,9 +1,9 @@
 ﻿using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace FarmsAPI.Validations;
+namespace HerdsAPI.Extensions;
 
-public static class Extensions
+public static class ValidationResultExtensions
 {
     public static void AddToModelState(this ValidationResult result, ModelStateDictionary modelState)
     {

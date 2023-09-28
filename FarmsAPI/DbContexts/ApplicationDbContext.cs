@@ -1,7 +1,7 @@
-﻿using FarmsAPI.Models;
+﻿using HerdsAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FarmsAPI.DbContexts;
+namespace HerdsAPI.DbContexts;
 
 public class ApplicationDbContext : DbContext
 {

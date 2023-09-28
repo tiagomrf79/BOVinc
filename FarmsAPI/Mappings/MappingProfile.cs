@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using FarmsAPI.DTO;
-using FarmsAPI.Models;
+using HerdsAPI.DTO;
+using HerdsAPI.Models;
 
-namespace FarmsAPI.Mappings;
+namespace HerdsAPI.Mappings;
 
 public class MappingProfile : Profile
 {

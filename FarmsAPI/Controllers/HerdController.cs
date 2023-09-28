@@ -1,29 +1,41 @@
 ﻿using AutoMapper;
-using FarmsAPI.DbContexts;
-using FarmsAPI.DTO;
-using FarmsAPI.Models;
-using FarmsAPI.Validations;
 using FluentValidation;
 using FluentValidation.Results;
+using HerdsAPI.DbContexts;
 using HerdsAPI.DTO;
+using HerdsAPI.Extensions;
+using HerdsAPI.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using System.Linq.Dynamic.Core;
+using System.Text.Json;
 
-namespace FarmsAPI.Controllers;
+namespace HerdsAPI.Controllers;
 
 [Route("[controller]")]
 [ApiController]
 public class HerdController : ControllerBase
 {
+    private static readonly SemaphoreSlim semaphore = new(1, 1);
+
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<HerdController> _logger;
+    private readonly IDistributedCache _distributedCache;
     private readonly IValidator<Herd> _validator;
     private readonly IMapper _mapper;
 
-    public HerdController(ApplicationDbContext context, IValidator<Herd> validator, IMapper mapper)
+    public HerdController(ApplicationDbContext context,
+                          ILogger<HerdController> logger,
+                          IDistributedCache distributedCache,
+                          IValidator<Herd> validator,
+                          IMapper mapper)
     {
         _context = context;
+        _logger = logger;
+        _distributedCache = distributedCache;
         _validator = validator;
         _mapper = mapper;
     }
@@ -33,7 +45,40 @@ public class HerdController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), 404)]
     public async Task<IActionResult> GetHerd(int id)
     {
-        Herd? herdFound = await _context.Herds.FindAsync(id);
+        var cacheKey = $"{nameof(GetHerd)}-{id}";
+
+        if (_distributedCache.TryGetValue(cacheKey, out Herd? herdFound))
+        {
+            _logger.Log(LogLevel.Information, "Herd found in cache.");
+        }
+        else
+        {
+            try
+            {
+                await semaphore.WaitAsync();
+
+                if (_distributedCache.TryGetValue(cacheKey, out herdFound))
+                {
+                    _logger.Log(LogLevel.Information, "Herd found in cache.");
+                }
+                else
+                {
+                    herdFound = await _context.Herds.FindAsync(id);
+
+                    _logger.Log(LogLevel.Information, "Herd fetched from database.");
+
+                    var cacheEntryOptions = new DistributedCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(1))
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
+
+                    await _distributedCache.SetAsync(cacheKey, herdFound, cacheEntryOptions);
+                }
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        }
 
         if (herdFound == null)
         {
@@ -59,18 +104,53 @@ public class HerdController : ControllerBase
     public async Task<IActionResult> SearchHerds([FromQuery] SearchQueryDto<HerdDto> searchOptions)
     {
         IQueryable<Herd> query = _context.Herds.AsQueryable();
-        
+
         if (!string.IsNullOrEmpty(searchOptions.FilterQuery))
             query = query.Where(h => h.Name.Contains(searchOptions.FilterQuery));
 
-        query = query
-            .OrderBy($"{searchOptions.SortColumn} {searchOptions.SortOrder}")
-            .Skip(searchOptions.PageIndex * searchOptions.PageSize)
-            .Take(searchOptions.PageSize);
+        var cacheKey = $"{nameof(SearchHerds)}-{JsonSerializer.Serialize(searchOptions)}";
 
-        List<Herd> herdsList = await query.ToListAsync();
-        List<HerdDto> listToReturn = _mapper.Map<List<HerdDto>>(herdsList);
-        
+        if (_distributedCache.TryGetValue(cacheKey, out IEnumerable<HerdDto>? listToReturn))
+        {
+            _logger.Log(LogLevel.Information, "Herd list found in cache.");
+        }
+        else
+        {
+            try
+            {
+                //To ensure that it is thread-safe, we proceed only once the thread enters the semaphore. (CODE-MAZE)
+                await semaphore.WaitAsync();
+
+                if (_distributedCache.TryGetValue(cacheKey, out listToReturn))
+                {
+                    _logger.Log(LogLevel.Information, "Herd list found in cache.");
+                }
+                else
+                {
+                    query = query
+                        .OrderBy($"{searchOptions.SortColumn} {searchOptions.SortOrder}")
+                        .Skip(searchOptions.PageIndex * searchOptions.PageSize)
+                        .Take(searchOptions.PageSize);
+
+                    List<Herd> herdsList = await query.ToListAsync();
+
+                    listToReturn = _mapper.Map<List<HerdDto>>(herdsList);
+
+                    _logger.Log(LogLevel.Information, "Herd list fetched from database.");
+
+                    var cacheEntryOptions = new DistributedCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(1))
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
+
+                    await _distributedCache.SetAsync(cacheKey, listToReturn, cacheEntryOptions);
+                }
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        }
+
         return Ok(listToReturn);
     }
 
@@ -148,6 +228,7 @@ public class HerdController : ControllerBase
 
         _context.Update(herdToUpdate);
         await _context.SaveChangesAsync();
+        await _distributedCache.RemoveAsync($"{nameof(GetHerd)}-{dtoReceived.Id}");
 
         return Ok(dtoReceived);
     }
@@ -175,6 +256,7 @@ public class HerdController : ControllerBase
 
         _context.Herds.Remove(herdToDelete);
         await _context.SaveChangesAsync();
+        await _distributedCache.RemoveAsync($"{nameof(GetHerd)}-{id}");
 
         return NoContent();
     }

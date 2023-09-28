@@ -1,4 +1,4 @@
-﻿namespace FarmsAPI.DTO;
+﻿namespace HerdsAPI.DTO;
 
 public class CreateHerdDto
 {

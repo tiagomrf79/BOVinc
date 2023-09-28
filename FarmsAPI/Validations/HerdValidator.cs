@@ -1,7 +1,7 @@
-﻿using FarmsAPI.Models;
-using FluentValidation;
+﻿using FluentValidation;
+using HerdsAPI.Models;
 
-namespace FarmsAPI.Validations;
+namespace HerdsAPI.Validations;
 
 public class HerdValidator : AbstractValidator<Herd>
 {
