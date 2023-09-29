@@ -2,6 +2,9 @@ using FluentValidation;
 using HerdsAPI.DbContexts;
 using HerdsAPI.Models;
 using HerdsAPI.Validations;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Exceptions;
@@ -47,7 +50,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen((options) =>
+{
+    options.EnableAnnotations();
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 {
@@ -79,11 +85,39 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+if (app.Configuration.GetValue<bool>("UseDeveloperExceptionPage"))
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/error");
+}
+
 app.UseHttpsRedirection();
 
 app.UseCors();
 
 app.UseAuthorization();
+
+app.MapGet("/error",
+    [EnableCors("AnyOrigin")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    (HttpContext context) =>
+    {
+        var exceptionHandler = context.Features.Get<IExceptionHandlerPathFeature>();
+
+        var details = new ProblemDetails();
+        details.Detail = exceptionHandler?.Error.Message;
+        details.Extensions["traceId"] = System.Diagnostics.Activity.Current?.Id ?? context.TraceIdentifier;
+        details.Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1";
+        details.Status = StatusCodes.Status500InternalServerError;
+
+        app.Logger.LogError(exceptionHandler?.Error, "An unhandled exception occurred.");
+
+        return Results.Problem(details);
+    }).ExcludeFromDescription();
+
 
 app.MapControllers();
 

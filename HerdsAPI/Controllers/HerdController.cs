@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Linq.Dynamic.Core;
-using System.Text.Json;
 
 namespace HerdsAPI.Controllers;
 
@@ -41,9 +41,11 @@ public class HerdController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [SwaggerOperation(Summary = "Get a single herd.", Description = "Retrieves a single herd with the given Id.")]
     [ProducesResponseType(typeof(HerdDto), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 404)]
-    public async Task<IActionResult> GetHerd(int id)
+    public async Task<IActionResult> GetHerd(
+        [SwaggerParameter("The Id of the herd to retrieve.")] int id)
     {
         var cacheKey = $"{nameof(GetHerd)}-{id}";
 
@@ -55,6 +57,7 @@ public class HerdController : ControllerBase
         {
             try
             {
+                //To ensure that it is thread-safe, we proceed only once the thread enters the semaphore. (CODE-MAZE)
                 await semaphore.WaitAsync();
 
                 if (_distributedCache.TryGetValue(cacheKey, out herdFound))
@@ -99,66 +102,37 @@ public class HerdController : ControllerBase
     }
 
     [HttpGet(Name = "SearchHerds")]
+    [SwaggerOperation(Summary = "Get a list of herds.", Description = "Retrieves a list of herds with custom paging, sorting, and filtering rules.")]
     [ProducesResponseType(typeof(List<HerdDto>), 200)]
     [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
-    public async Task<IActionResult> SearchHerds([FromQuery] SearchQueryDto<HerdDto> searchOptions)
+    public async Task<IActionResult> SearchHerds(
+        [FromQuery][SwaggerParameter("A DTO object that can be used to customize the data-retrieval parameters.")] SearchQueryDto<HerdDto> searchOptions)
     {
         IQueryable<Herd> query = _context.Herds.AsQueryable();
 
         if (!string.IsNullOrEmpty(searchOptions.FilterQuery))
             query = query.Where(h => h.Name.Contains(searchOptions.FilterQuery));
 
-        var cacheKey = $"{nameof(SearchHerds)}-{JsonSerializer.Serialize(searchOptions)}";
+        query = query
+            .OrderBy($"{searchOptions.SortColumn} {searchOptions.SortOrder}")
+            .Skip(searchOptions.PageIndex * searchOptions.PageSize)
+            .Take(searchOptions.PageSize);
 
-        if (_distributedCache.TryGetValue(cacheKey, out IEnumerable<HerdDto>? listToReturn))
-        {
-            _logger.Log(LogLevel.Information, "Herd list found in cache.");
-        }
-        else
-        {
-            try
-            {
-                //To ensure that it is thread-safe, we proceed only once the thread enters the semaphore. (CODE-MAZE)
-                await semaphore.WaitAsync();
+        List<Herd> herdsList = await query.ToListAsync();
+        List<HerdDto> listToReturn = _mapper.Map<List<HerdDto>>(herdsList);
 
-                if (_distributedCache.TryGetValue(cacheKey, out listToReturn))
-                {
-                    _logger.Log(LogLevel.Information, "Herd list found in cache.");
-                }
-                else
-                {
-                    query = query
-                        .OrderBy($"{searchOptions.SortColumn} {searchOptions.SortOrder}")
-                        .Skip(searchOptions.PageIndex * searchOptions.PageSize)
-                        .Take(searchOptions.PageSize);
-
-                    List<Herd> herdsList = await query.ToListAsync();
-
-                    listToReturn = _mapper.Map<List<HerdDto>>(herdsList);
-
-                    _logger.Log(LogLevel.Information, "Herd list fetched from database.");
-
-                    var cacheEntryOptions = new DistributedCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(1))
-                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
-
-                    await _distributedCache.SetAsync(cacheKey, listToReturn, cacheEntryOptions);
-                }
-            }
-            finally
-            {
-                semaphore.Release();
-            }
-        }
+        _logger.Log(LogLevel.Information, "Herd list fetched from database.");
 
         return Ok(listToReturn);
     }
 
     [HttpPost(Name = "CreateHerd")]
+    [SwaggerOperation(Summary = "Creates a herd.", Description = "Inserts a new herd into the database.")]
     [ProducesResponseType(typeof(HerdDto), 201)]
     [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
     [ResponseCache(NoStore = true)]
-    public async Task<IActionResult> CreateHerd(CreateHerdDto dtoReceived)
+    public async Task<IActionResult> CreateHerd(
+        [SwaggerParameter("A DTO object containing the data to create a new herd.")] CreateHerdDto dtoReceived)
     {
         Herd herdToCreate = _mapper.Map<Herd>(dtoReceived);
         herdToCreate.DateCreated = DateTime.Now;
@@ -187,11 +161,13 @@ public class HerdController : ControllerBase
     }
 
     [HttpPut(Name = "UpdateHerd")]
+    [SwaggerOperation(Summary = "Updates a herd.", Description = "Updates the herd's data.")]
     [ProducesResponseType(typeof(HerdDto), 200)]
     [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
     [ProducesResponseType(typeof(ProblemDetails), 404)]
     [ResponseCache(NoStore = true)]
-    public async Task<IActionResult> UpdateHerd(HerdDto dtoReceived)
+    public async Task<IActionResult> UpdateHerd(
+        [SwaggerParameter("A DTO object containing the herd's data to be updated.")] HerdDto dtoReceived)
     {
         Herd? herdToUpdate = await _context.Herds.FindAsync(dtoReceived.Id);
 
@@ -234,10 +210,12 @@ public class HerdController : ControllerBase
     }
 
     [HttpDelete(Name = "DeleteHerd")]
+    [SwaggerOperation(Summary = "Deletes a herd.", Description = "Deletes a herd from the database.")]
     [ProducesResponseType(typeof(NoContent), 204)]
     [ProducesResponseType(typeof(ProblemDetails), 404)]
     [ResponseCache(NoStore = true)]
-    public async Task<IActionResult> DeleteHerd(int id)
+    public async Task<IActionResult> DeleteHerd(
+        [SwaggerParameter("The Id of the herd to delete.")] int id)
     {
         Herd? herdToDelete = await _context.Herds.FindAsync(id);
 
