@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using HerdsAPI.DTO;
-using HerdsAPI.Models;
+using FarmsAPI.DTO;
+using FarmsAPI.Models;
 
-namespace HerdsAPI.Mappings;
+namespace FarmsAPI.Mappings;
 
 public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Herd, HerdDto>().ReverseMap();
-        CreateMap<CreateHerdDto, Herd>();
+        CreateMap<Farm, FarmResponseDto>().ReverseMap();
+        CreateMap<FarmUpdateDto, Farm>();
     }
 }

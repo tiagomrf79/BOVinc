@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FarmsAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Herds",
+                name: "Farms",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -27,7 +27,7 @@ namespace FarmsAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Herds", x => x.Id);
+                    table.PrimaryKey("PK_Farms", x => x.Id);
                 });
         }
 
@@ -35,7 +35,7 @@ namespace FarmsAPI.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Herds");
+                name: "Farms");
         }
     }
 }

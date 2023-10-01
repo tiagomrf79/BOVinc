@@ -1,7 +1,4 @@
-using FluentValidation;
-using HerdsAPI.DbContexts;
-using HerdsAPI.Models;
-using HerdsAPI.Validations;
+using FarmsAPI.DbContexts;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -46,23 +43,38 @@ builder.Services.AddCors((options) =>
         });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers((options) =>
+{
+    options.ReturnHttpNotAcceptable = true;
+    options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable));
+    options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status500InternalServerError));
+    options.Filters.Add(new ProducesAttribute("application/json"));
+});
 
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen((options) =>
 {
+    options.SwaggerDoc("FarmsOpenAPISpecification", new()
+    {
+        Title = "Farms API",
+        Version = "1",
+        Description = "Through this API you can access farms."
+    });
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlFullPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+    options.IncludeXmlComments(xmlFullPath);
+
     options.EnableAnnotations();
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("HerdsDatabase"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("FarmsDatabase"));
 });
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
-builder.Services.AddScoped<IValidator<Herd>, HerdValidator>();
 
 if (builder.Environment.IsDevelopment())
 {
@@ -82,7 +94,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI((options) =>
+    {
+        options.SwaggerEndpoint("/swagger/FarmsOpenAPISpecification/swagger.json", "Farms API");
+    });
 }
 
 if (app.Configuration.GetValue<bool>("UseDeveloperExceptionPage"))

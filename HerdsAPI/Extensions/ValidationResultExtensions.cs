@@ -1,7 +1,7 @@
 ﻿using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace HerdsAPI.Extensions;
+namespace FarmsAPI.Extensions;
 
 public static class ValidationResultExtensions
 {

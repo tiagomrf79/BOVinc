@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace HerdsAPI.Extensions;
+namespace FarmsAPI.Extensions;
 
 public static class DistributedCacheExtensions
 {
@@ -17,7 +17,7 @@ public static class DistributedCacheExtensions
 
     public static Task SetAsync<T>(this IDistributedCache cache, string key, T value)
     {
-        return SetAsync(cache, key, value, new DistributedCacheEntryOptions());
+        return cache.SetAsync(key, value, new DistributedCacheEntryOptions());
     }
     public static Task SetAsync<T>(this IDistributedCache cache, string key, T value, DistributedCacheEntryOptions options)
     {

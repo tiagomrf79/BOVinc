@@ -1,0 +1,6 @@
+﻿clean up program.cs by separating services and pipeline
+remove unused packages
+add openapi examples
+configure docker file
+improve what is logged
+refactor update method
