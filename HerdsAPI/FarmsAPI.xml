@@ -16,7 +16,7 @@
             <param name="dtoReceived">A DTO object containing the data to create a new farm.</param>
             <response code="201">Returns the newly created farm's ID.</response>
         </member>
-        <member name="M:FarmsAPI.Controllers.FarmController.Put(System.Int32,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{FarmsAPI.DTO.FarmUpdateDto})">
+        <member name="M:FarmsAPI.Controllers.FarmController.Put(System.Int32,FarmsAPI.DTO.FarmUpdateDto)">
             <param name="id">The ID of the farm to update.</param>
             <param name="dtoReceived">A DTO object containing the properties to update in the selected farm.</param>
         </member>

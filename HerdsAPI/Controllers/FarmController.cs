@@ -153,7 +153,7 @@ public class FarmController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Consumes("application/json")]
     [ResponseCache(NoStore = true)]
-    public async Task<ActionResult> Put(int id, JsonPatchDocument<FarmUpdateDto> dtoReceived)
+    public async Task<ActionResult> Put(int id, FarmUpdateDto dtoReceived)
     {
         Farm? farmToUpdate = await _context.Farms.FindAsync(id);
 
