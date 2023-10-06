@@ -46,4 +46,4 @@ jobs:
           context: .
           file: ./FarmsAPI/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:latest, ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:${{ github.run_number }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:latest
