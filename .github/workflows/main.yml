@@ -25,6 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       -
@@ -41,6 +44,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./FarmsAPI/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:latest, ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:${{ github.run_number }}
