@@ -1,3 +1,4 @@
 ﻿remove unused packages
 
 configure pull and run image from registry
+
