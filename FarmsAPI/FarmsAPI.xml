@@ -10,7 +10,7 @@
         </member>
         <member name="M:FarmsAPI.Controllers.FarmController.Get(FarmsAPI.DTO.SearchQueryDto{FarmsAPI.DTO.FarmResponseDto})">
             <param name="searchOptions">A DTO object that can be used to customize the data-retrieval parameters.</param>
-            <response code="200">Returns a list of farms..</response>
+            <response code="200">Returns a list of farms.</response>
         </member>
         <member name="M:FarmsAPI.Controllers.FarmController.Post(FarmsAPI.DTO.FarmUpdateDto)">
             <param name="dtoReceived">A DTO object containing the data to create a new farm.</param>

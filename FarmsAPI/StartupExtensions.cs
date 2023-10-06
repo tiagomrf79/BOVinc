@@ -102,7 +102,7 @@ public static class StartupExtensions
             });
         }
 
-        if (app.Configuration.GetValue<bool>("UseDeveloperExceptionPage"))
+        if (!app.Configuration.GetValue<bool>("UseDeveloperExceptionPage"))
         {
             app.UseDeveloperExceptionPage();
         }

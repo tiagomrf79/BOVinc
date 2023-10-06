@@ -4,7 +4,6 @@ using FarmsAPI.DTO;
 using FarmsAPI.Extensions;
 using FarmsAPI.Models;
 using FluentValidation;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
@@ -44,11 +43,13 @@ public class FarmController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<FarmResponseDto>> Get(int id)
     {
-        var cacheKey = $"{nameof(Get)}-{id}";
+        _logger.LogInformation("Attempting to get farm with ID {id}.", id);
+
+        string cacheKey = $"{nameof(Get)}-{id}";
 
         if (_distributedCache.TryGetValue(cacheKey, out Farm? farmFound))
         {
-            _logger.Log(LogLevel.Information, "Farm found in cache.");
+            _logger.LogInformation("Farm with ID {id} found in cache.", id);
         }
         else
         {
@@ -59,13 +60,13 @@ public class FarmController : ControllerBase
 
                 if (_distributedCache.TryGetValue(cacheKey, out farmFound))
                 {
-                    _logger.Log(LogLevel.Information, "Farm found in cache.");
+                    _logger.LogInformation("Farm with ID {id} found in cache.", id);
                 }
                 else
                 {
                     farmFound = await _context.Farms.FindAsync(id);
 
-                    _logger.Log(LogLevel.Information, "Farm fetched from database.");
+                    _logger.LogInformation("Farm with ID {id} fetched from database.", id);
 
                     var cacheEntryOptions = new DistributedCacheEntryOptions()
                         .SetSlidingExpiration(TimeSpan.FromMinutes(1))
@@ -90,21 +91,25 @@ public class FarmController : ControllerBase
                 Detail = $"The farm with ID {id} does not exist."
             };
 
+            _logger.LogInformation("The farm with ID {id} does not exist.", id);
             return NotFound(problemDetails);
         }
 
         FarmResponseDto dtoToReturn = _mapper.Map<FarmResponseDto>(farmFound);
 
+        _logger.LogInformation("Returning farm with ID {id}", id);
         return Ok(dtoToReturn);
     }
 
     /// <param name="searchOptions">A DTO object that can be used to customize the data-retrieval parameters.</param>
-    /// <response code="200">Returns a list of farms..</response>
+    /// <response code="200">Returns a list of farms.</response>
     [HttpGet(Name = "SearchFarms")]
     [SwaggerOperation(Summary = "Get a list of farms.", Description = "Retrieves a list of farms with custom paging, sorting, and filtering rules.")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<FarmResponseDto>>> Get([FromQuery] SearchQueryDto<FarmResponseDto> searchOptions)
     {
+        _logger.LogInformation("Attempting to retrieve list of farms from query: {@searchOptions}", searchOptions);
+
         IQueryable<Farm> query = _context.Farms.AsQueryable();
 
         if (!string.IsNullOrEmpty(searchOptions.FilterQuery))
@@ -118,8 +123,7 @@ public class FarmController : ControllerBase
         List<Farm> farmsList = await query.ToListAsync();
         List<FarmResponseDto> listToReturn = _mapper.Map<List<FarmResponseDto>>(farmsList);
 
-        _logger.Log(LogLevel.Information, "Farm list fetched from database.");
-
+        _logger.LogInformation("Returning {listToReturn.Count} farms after search query.", listToReturn.Count);
         return Ok(listToReturn);
     }
 
@@ -133,6 +137,8 @@ public class FarmController : ControllerBase
     [ResponseCache(NoStore = true)]
     public async Task<ActionResult<int>> Post(FarmUpdateDto dtoReceived)
     {
+        _logger.LogInformation("Received request to create a new farm with data {@dtoReceived}", dtoReceived);
+
         Farm farmToCreate = _mapper.Map<Farm>(dtoReceived);
         farmToCreate.DateCreated = DateTime.Now;
 
@@ -141,6 +147,7 @@ public class FarmController : ControllerBase
 
         FarmResponseDto dtoToReturn = _mapper.Map<FarmResponseDto>(farmToCreate);
 
+        _logger.LogInformation("New farm created with ID {dtoToReturn.Id}.", dtoToReturn.Id);
         return CreatedAtAction(nameof(Get), new { id = dtoToReturn.Id }, dtoToReturn.Id);
     }
 
@@ -155,6 +162,8 @@ public class FarmController : ControllerBase
     [ResponseCache(NoStore = true)]
     public async Task<ActionResult> Put(int id, FarmUpdateDto dtoReceived)
     {
+        _logger.LogInformation("Received request to update farm with ID {id} and data {@dtoReceived}", id, dtoReceived);
+
         Farm? farmToUpdate = await _context.Farms.FindAsync(id);
 
         if (farmToUpdate == null)
@@ -167,6 +176,7 @@ public class FarmController : ControllerBase
                 Detail = $"The farm with ID {id} does not exist."
             };
 
+            _logger.LogInformation("The farm with ID {id} does not exist.", id);
             return NotFound(problemDetails);
         }
 
@@ -177,6 +187,7 @@ public class FarmController : ControllerBase
         await _context.SaveChangesAsync();
         await _distributedCache.RemoveAsync($"{nameof(Get)}-{id}");
 
+        _logger.LogInformation($"Farm with ID {id} updated successfully.");
         return Ok();
     }
 
@@ -188,6 +199,8 @@ public class FarmController : ControllerBase
     [ResponseCache(NoStore = true)]
     public async Task<ActionResult> Delete(int id)
     {
+        _logger.LogInformation("Received request to delete farm with ID {id}.", id);
+
         Farm? farmToDelete = await _context.Farms.FindAsync(id);
 
         if (farmToDelete == null)
@@ -200,6 +213,7 @@ public class FarmController : ControllerBase
                 Detail = $"The farm with ID {id} does not exist."
             };
 
+            _logger.LogInformation("The farm with ID {id} does not exist.", id);
             return NotFound(problemDetails);
         }
 
@@ -207,6 +221,7 @@ public class FarmController : ControllerBase
         await _context.SaveChangesAsync();
         await _distributedCache.RemoveAsync($"{nameof(Get)}-{id}");
 
+        _logger.LogInformation($"Farm with ID {id} deleted successfully.");
         return NoContent();
     }
 }

@@ -1,3 +1,0 @@
-﻿remove unused packages
-configure docker file
-improve what is logged
