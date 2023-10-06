@@ -5,13 +5,13 @@ on:
   # Triggers the workflow on push or pull request events
   push:
     branches:
-      - 'main'
+      - 'master'
     paths-ignore:
       - README.md
       - .gitignore
   pull_request:
     branches:
-      - 'main'
+      - 'master'
     paths-ignore:
       - README.md
       - .gitignore
