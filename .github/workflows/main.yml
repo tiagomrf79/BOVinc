@@ -5,13 +5,13 @@ on:
   # Triggers the workflow on push or pull request events
   push:
     branches:
-      - 'master'
+      - 'main'
     paths-ignore:
       - README.md
       - .gitignore
   pull_request:
     branches:
-      - 'master'
+      - 'main'
     paths-ignore:
       - README.md
       - .gitignore
@@ -46,4 +46,4 @@ jobs:
           context: .
           file: ./FarmsAPI/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:latest, ${{ secrets.DOCKERHUB_USERNAME }}/farmapi:${{ github.run_number }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:latest, ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:${{ github.run_number }}
