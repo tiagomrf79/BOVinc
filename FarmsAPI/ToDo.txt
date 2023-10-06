@@ -1,7 +1,3 @@
 ﻿remove unused packages
-configure docker file
 
-https://app.pluralsight.com/course-player?clipId=00570d76-1969-4e76-95bd-240db8113af8
-push image to docker registry (or Azure Container Registry?)
-configure github actions (or Azure Pipelines?) to build and push image
 configure pull and run image from registry
