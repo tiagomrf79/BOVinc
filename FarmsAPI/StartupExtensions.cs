@@ -82,9 +82,13 @@ public static class StartupExtensions
         }
         else
         {
-            builder.Services.AddDistributedRedisCache(option =>
+            /*builder.Services.AddDistributedRedisCache(option =>
             {
                 option.Configuration = builder.Configuration.GetConnectionString("RedisCache");
+            });*/
+            builder.Services.AddStackExchangeRedisCache((options) => 
+            {
+                options.Configuration = builder.Configuration.GetConnectionString("RedisCache");
             });
         }
 
