@@ -1,6 +1,1 @@
-﻿remove unused packages
-
-add dummy data to database
-- create db if not exists
-- insert dummy data
-
+﻿create controller to seed data
