@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FarmsAPI.DTO;
 using FarmsAPI.Models;
+using FarmsAPI.Models.csv;
 
 namespace FarmsAPI.Mappings;
 
@@ -10,5 +11,6 @@ public class MappingProfile : Profile
     {
         CreateMap<Farm, FarmResponseDto>().ReverseMap();
         CreateMap<FarmUpdateDto, Farm>();
+        CreateMap<FarmRecord, Farm>();
     }
 }
