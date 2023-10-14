@@ -6,17 +6,17 @@ services:
     build:
       context: .
       dockerfile: FarmsAPI/Dockerfile
-    # ports:
-    #   - '8080:80'
-    #   - '8090:443'
-    # depends_on:
-    #   - seq_in_dc
+    ports:
+      - '8080:80'
+      - '8090:443'
+    depends_on:
+      - seq_in_dc
 
-  # seq_in_dc:
-  #   image: datalust/seq
-  #   # ports:
-  #   #   - '8005:80'
-  #   environment:
-  #     - ACCEPT_EULA=Y
+  seq_in_dc:
+    image: datalust/seq
+    ports:
+      - '8005:80'
+    environment:
+      - ACCEPT_EULA=Y
   
 
