@@ -1,6 +1,6 @@
 # BOVinc
 
-##Farms API
+## Farms API
 A simple RESTful API with a single entity and CRUD endpoints.
 
 Implementations details:
