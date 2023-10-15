@@ -72,7 +72,6 @@ public static class StartupExtensions
         builder.Services.AddDbContext<ApplicationDbContext>(opt =>
         {
             var databaseConnectionString = builder.Configuration.GetConnectionString("FarmsDatabase") ?? throw new InvalidOperationException("Connection string 'FarmsDatabase' not found.");
-            //var databaseConnectionString = Environment.GetEnvironmentVariable("FarmsDbConnString") ?? throw new InvalidOperationException("Connection string for 'Farms' database not found.");
             opt.UseSqlServer(databaseConnectionString);
         });
 
@@ -87,7 +86,6 @@ public static class StartupExtensions
             builder.Services.AddStackExchangeRedisCache((options) => 
             {
                 options.Configuration = builder.Configuration.GetConnectionString("RedisCache") ?? throw new InvalidOperationException("Connection string 'RedisCache' not found.");
-                //options.Configuration = Environment.GetEnvironmentVariable("RedisCacheConnString") ?? throw new InvalidOperationException("Connection string for Redis cache not found.");
             });
         }
 
