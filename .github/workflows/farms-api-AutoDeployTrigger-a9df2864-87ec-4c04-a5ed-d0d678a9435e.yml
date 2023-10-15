@@ -37,11 +37,11 @@ jobs:
         with:
           appSourcePath: ${{ github.workspace }} 
           registryUrl: docker.io
-          registryUsername: ${{ secrets.FARMSAPI_REGISTRY_USERNAME }}
-          registryPassword: ${{ secrets.FARMSAPI_REGISTRY_PASSWORD }}
+          registryUsername: ${{ secrets.DOCKERHUB_USERNAME }}
+          registryPassword: ${{ secrets.DOCKERHUB_TOKEN  }}
           containerAppName: farms-api
           resourceGroup: bovinc-rg
-          imageToBuild: tf790515/farmsapi:${{ github.sha }}
+          imageToBuild: ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:${{ github.sha }}
           
 
      
