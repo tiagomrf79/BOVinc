@@ -3,7 +3,6 @@ using FarmsAPI.DbContexts;
 using FarmsAPI.DTO;
 using FarmsAPI.Extensions;
 using FarmsAPI.Models;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
