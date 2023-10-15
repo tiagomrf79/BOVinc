@@ -43,12 +43,6 @@ public class FarmController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<FarmResponseDto>> Get(int id)
     {
-        return Ok(new FarmResponseDto
-        {
-            Id = 99,
-            Name = "App is updated"
-        });
-
         _logger.LogInformation("Attempting to get farm with ID {id}.", id);
 
         string cacheKey = $"{nameof(Get)}-{id}";
