@@ -29,4 +29,4 @@ Environment:
 
 To do:
 - Implement authentication and authorization
-- Change the Serilog sinks configurations (from appsettings to services)?
+- Configure and test App Insights connection string in Azure Key Vault and user secrets
