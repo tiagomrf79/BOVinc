@@ -30,4 +30,3 @@ Environment:
 To do:
 - Implement authentication and authorization
 - Change the Serilog sinks configurations (from appsettings to services)?
-- Use in memory SQL database for development
