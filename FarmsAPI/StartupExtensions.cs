@@ -18,13 +18,15 @@ public static class StartupExtensions
         builder.Host.UseSerilog((context, loggerConfiguration) =>
         {
             loggerConfiguration
-                .ReadFrom.Configuration(builder.Configuration)
+                .ReadFrom.Configuration(context.Configuration)
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithThreadId()
                 .Enrich.WithExceptionDetails()
                 .Enrich.WithProperty("Assembly", $"{Assembly.GetExecutingAssembly().GetName().Name}");
         });
+
+        builder.Services.AddApplicationInsightsTelemetry();
 
         builder.Services.AddCors((options) =>
         {
@@ -137,6 +139,8 @@ public static class StartupExtensions
             }).ExcludeFromDescription();
 
         app.MapControllers();
+
+        app.UseSerilogRequestLogging();
 
         return app;
     }
