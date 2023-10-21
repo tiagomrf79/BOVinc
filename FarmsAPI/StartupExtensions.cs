@@ -1,10 +1,13 @@
 ﻿using FarmsAPI.DbContexts;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Serilog.Events;
 using Serilog.Exceptions;
+using Serilog.Sinks.SystemConsole.Themes;
 using System.Reflection;
 
 namespace FarmsAPI;
@@ -15,7 +18,9 @@ public static class StartupExtensions
     {
         builder.Logging.ClearProviders();
 
-        builder.Host.UseSerilog((context, loggerConfiguration) =>
+        builder.Services.AddApplicationInsightsTelemetry();
+
+        builder.Host.UseSerilog((context, services, loggerConfiguration) =>
         {
             loggerConfiguration
                 .ReadFrom.Configuration(context.Configuration)
@@ -24,9 +29,21 @@ public static class StartupExtensions
                 .Enrich.WithThreadId()
                 .Enrich.WithExceptionDetails()
                 .Enrich.WithProperty("Assembly", $"{Assembly.GetExecutingAssembly().GetName().Name}");
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                loggerConfiguration.WriteTo.Console(
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} <s:{SourceContext}>{NewLine}{Exception}",
+                    restrictedToMinimumLevel: LogEventLevel.Verbose,
+                    theme: AnsiConsoleTheme.Code);
+                loggerConfiguration.WriteTo.Seq("http://seq_in_dc:5341");
+            }
+            else
+            {
+                loggerConfiguration.WriteTo.ApplicationInsights(
+                    services.GetRequiredService<TelemetryConfiguration>(),
+                    TelemetryConverter.Traces);
+            }
         });
-
-        builder.Services.AddApplicationInsightsTelemetry();
 
         builder.Services.AddCors((options) =>
         {
