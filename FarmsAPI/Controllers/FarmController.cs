@@ -107,7 +107,6 @@ public class FarmController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<FarmResponseDto>>> Get([FromQuery] SearchQueryDto<FarmResponseDto> searchOptions)
     {
-        _logger.LogError("Testing the different sinks under different environments!");
         _logger.LogInformation("Attempting to retrieve list of farms from query: {@searchOptions}", searchOptions);
 
         IQueryable<Farm> query = _context.Farms.AsQueryable();
