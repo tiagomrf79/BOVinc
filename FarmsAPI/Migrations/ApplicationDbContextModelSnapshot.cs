@@ -17,7 +17,7 @@ namespace FarmsAPI.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("ProductVersion", "7.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -97,7 +97,7 @@ namespace FarmsAPI.Migrations
                         new
                         {
                             Id = 4,
-                            Address = "Largo Senhora-A-Branca 144\r\n",
+                            Address = "Largo Senhora-A-Branca 144",
                             City = "Braga",
                             Country = "Portugal",
                             DateCreated = new DateTime(2023, 8, 28, 15, 34, 34, 0, DateTimeKind.Unspecified),
