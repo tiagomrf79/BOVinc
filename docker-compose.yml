@@ -12,6 +12,16 @@ services:
     depends_on:
       - seq_in_dc
 
+  animalsapi:
+    build:
+      context: .
+      dockerfile: AnimalsAPI/Dockerfile
+    ports:
+      - '8081:80'
+      - '8091:443'
+    depends_on:
+      - seq_in_dc
+
   seq_in_dc:
     image: datalust/seq
     ports:

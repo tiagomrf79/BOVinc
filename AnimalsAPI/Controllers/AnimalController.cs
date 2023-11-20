@@ -43,7 +43,7 @@ public class AnimalController : ControllerBase
     {
         _logger.LogInformation("Attempting to get animal with ID {id}", id);
 
-        string cacheKey = $"{nameof(Get)}-{id}";
+        string cacheKey = $"AnimalsAPI-{nameof(Get)}-{id}";
 
         if (_distributedCache.TryGetValue(cacheKey, out Animal? animalFound))
         {
@@ -187,7 +187,7 @@ public class AnimalController : ControllerBase
 
         _context.Update(animalToUpdate);
         await _context.SaveChangesAsync();
-        await _distributedCache.RemoveAsync($"{nameof(Get)}-{id}");
+        await _distributedCache.RemoveAsync($"AnimalsAPI-{nameof(Get)}-{id}");
 
         _logger.LogInformation($"Animal with ID {id} updated successfully.");
         return Ok();
@@ -221,7 +221,7 @@ public class AnimalController : ControllerBase
 
         _context.Animals.Remove(animalToDelete);
         await _context.SaveChangesAsync();
-        await _distributedCache.RemoveAsync($"{nameof(Get)}-{id}");
+        await _distributedCache.RemoveAsync($"AnimalsAPI-{nameof(Get)}-{id}");
 
         _logger.LogInformation($"Animal with ID {id} deleted successfully.");
         return NoContent();

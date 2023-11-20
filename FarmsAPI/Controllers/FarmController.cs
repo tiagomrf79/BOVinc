@@ -44,7 +44,7 @@ public class FarmController : ControllerBase
     {
         _logger.LogInformation("Attempting to get farm with ID {id}.", id);
 
-        string cacheKey = $"{nameof(Get)}-{id}";
+        string cacheKey = $"FarmsAPI-{nameof(Get)}-{id}";
 
         if (_distributedCache.TryGetValue(cacheKey, out Farm? farmFound))
         {
@@ -185,7 +185,7 @@ public class FarmController : ControllerBase
         _context.Update(farmToUpdate);
         await _context.SaveChangesAsync();
 
-        await _distributedCache.RemoveAsync($"{nameof(Get)}-{id}");
+        await _distributedCache.RemoveAsync($"FarmsAPI-{nameof(Get)}-{id}");
 
         _logger.LogInformation($"Farm with ID {id} updated successfully.");
         return Ok();
@@ -220,7 +220,7 @@ public class FarmController : ControllerBase
         _context.Farms.Remove(farmToDelete);
         await _context.SaveChangesAsync();
 
-        await _distributedCache.RemoveAsync($"{nameof(Get)}-{id}");
+        await _distributedCache.RemoveAsync($"FarmsAPI-{nameof(Get)}-{id}");
 
         _logger.LogInformation($"Farm with ID {id} deleted successfully.");
         return NoContent();
