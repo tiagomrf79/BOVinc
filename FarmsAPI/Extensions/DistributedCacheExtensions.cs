@@ -28,8 +28,11 @@ public static class DistributedCacheExtensions
     {
         var val = cache.Get(key);
         value = default;
+
         if (val == null) return false;
+
         value = JsonSerializer.Deserialize<T>(val, _serializerOptions);
+
         return true;
     }
 }

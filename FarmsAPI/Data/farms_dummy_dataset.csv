@@ -1,4 +1,4 @@
-﻿Id;Name;Address;City;Region;Country
+﻿Id;FarmId;Address;City;Region;Country
 1;Jorge Oliveira de Pacheco;Avenida Diogo Leite 70;Porto;Porto;Portugal
 2;Eduarda Clara Moreira;Estrada Monumental 316;Funchal;Madeira;Portugal
 3;Nuno Abreu Nascimento;Avenida Calouste Gulbenkian 22B;Coimbra;Coimbra;Portugal

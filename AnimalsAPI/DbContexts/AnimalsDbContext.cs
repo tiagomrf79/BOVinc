@@ -21,9 +21,11 @@ public class AnimalsDbContext : DbContext
         modelBuilder.Entity<Animal>().Property(a => a.RegistrationId).HasMaxLength(25);
         modelBuilder.Entity<Animal>().Property(a => a.Name).HasMaxLength(25);
         modelBuilder.Entity<Animal>().Property(a => a.Tag).HasMaxLength(10);
-        //bind enums
-        modelBuilder.Entity<Animal>().Property(a => a.DataOfBirth).IsRequired();
-        //bind mother and father
+        modelBuilder.Entity<Animal>().Property(a => a.Gender).IsRequired().HasConversion(g => (int)g, g => (Gender)g);
+        modelBuilder.Entity<Animal>().Property(a => a.Breed).IsRequired().HasConversion(b => (int)b, b => (Breed)b);
+        modelBuilder.Entity<Animal>().Property(a => a.DateOfBirth).IsRequired();
+        modelBuilder.Entity<Animal>().HasOne(a => a.Mother).WithMany().HasForeignKey(a => a.MotherId);
+        modelBuilder.Entity<Animal>().HasOne(a => a.Father).WithMany().HasForeignKey(a => a.FatherId);
         modelBuilder.Entity<Animal>().Property(a => a.DateCreated).IsRequired();
 
     }

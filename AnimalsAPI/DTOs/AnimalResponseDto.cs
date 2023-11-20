@@ -1,6 +1,4 @@
-﻿using AnimalsAPI.Models;
-
-namespace AnimalsAPI.DTOs;
+﻿namespace AnimalsAPI.DTOs;
 
 public class AnimalResponseDto
 {
@@ -12,7 +10,7 @@ public class AnimalResponseDto
     
     //add enums to return
 
-    public DateOnly? DataOfBirth { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
     public int? MotherId { get; set; }
     public int? FatherId { get; set; }
 

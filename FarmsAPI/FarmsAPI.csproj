@@ -4,9 +4,9 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>827c5cad-5b40-49e6-b6fd-038f579171b2</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<IncludeOpenAPIAnalyzers>true</IncludeOpenAPIAnalyzers>
+    <UserSecretsId>827c5cad-5b40-49e6-b6fd-038f579171b2</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

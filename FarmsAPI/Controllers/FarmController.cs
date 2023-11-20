@@ -184,6 +184,7 @@ public class FarmController : ControllerBase
 
         _context.Update(farmToUpdate);
         await _context.SaveChangesAsync();
+
         await _distributedCache.RemoveAsync($"{nameof(Get)}-{id}");
 
         _logger.LogInformation($"Farm with ID {id} updated successfully.");
@@ -218,6 +219,7 @@ public class FarmController : ControllerBase
 
         _context.Farms.Remove(farmToDelete);
         await _context.SaveChangesAsync();
+
         await _distributedCache.RemoveAsync($"{nameof(Get)}-{id}");
 
         _logger.LogInformation($"Farm with ID {id} deleted successfully.");

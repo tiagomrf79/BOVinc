@@ -1,0 +1,6 @@
+﻿Id;FarmId;RegistrationId;Name;Tag;Gender;Breed;DateOfBirth;MotherId;FatherId
+3;2;PT 393 224973;Marquesa;4973;1;0;15/05/2018;1;2
+1;2;PTO 162673;Gabriela;2673;1;0;25/11/2014;;
+2;2;PT 193 192871;Zé Pequeno;2871;2;0;17/08/2016;;
+4;2;PT 693 286286;;6286;1;0;02/01/2022;1;
+5;2;;;;;;11/11/2023;3;2

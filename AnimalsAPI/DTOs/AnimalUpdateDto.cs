@@ -1,5 +1,4 @@
-﻿using AnimalsAPI.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AnimalsAPI.DTOs;
 
@@ -33,7 +32,7 @@ public class AnimalUpdateDto
     /// <summary>Date of birth</summary>
     /// <example>14/10/2018</example>
     [Required]
-    public DateOnly? DataOfBirth { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
 
     /// <summary>ID of the mother if known</summary>
     /// <example>PT193162686</example>
