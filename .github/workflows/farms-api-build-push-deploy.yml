@@ -33,6 +33,7 @@ jobs:
       - name: Build and push container image to registry
         uses: azure/container-apps-deploy-action@v1
         with:
+          file: ./FarmsAPI/Dockerfile
           appSourcePath: ${{ github.workspace }} 
           registryUrl: docker.io
           registryUsername: ${{ secrets.DOCKERHUB_USERNAME }}
