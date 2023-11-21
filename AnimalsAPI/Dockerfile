@@ -6,17 +6,15 @@ EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["AnimalsAPI/AnimalsAPI.csproj", "AnimalsAPI/"]
-RUN dotnet restore "./AnimalsAPI/./AnimalsAPI.csproj"
+RUN dotnet restore "AnimalsAPI/AnimalsAPI.csproj"
 COPY . .
 WORKDIR "/src/AnimalsAPI"
-RUN dotnet build "./AnimalsAPI.csproj" -c Release -o /app/build
+RUN dotnet build "AnimalsAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./AnimalsAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "AnimalsAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
