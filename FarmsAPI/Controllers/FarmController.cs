@@ -28,6 +28,7 @@ public class FarmController : ControllerBase
                           IDistributedCache distributedCache,
                           IMapper mapper)
     {
+        //erase me please
         _context = context;
         _logger = logger;
         _distributedCache = distributedCache;
