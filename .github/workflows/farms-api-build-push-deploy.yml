@@ -12,7 +12,7 @@ on:
 
   # Allow manual trigger 
   workflow_dispatch:
-      
+  
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -24,24 +24,4 @@ jobs:
     steps:
       - name: Checkout to the branch
         uses: actions/checkout@v2
-
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.FARMSAPI_AZURE_CREDENTIALS }}
-
-      - name: Build and push container image to registry
-        uses: azure/container-apps-deploy-action@v1
-        with:
-          file: ./FarmsAPI/Dockerfile
-          appSourcePath: ${{ github.workspace }} 
-          registryUrl: docker.io
-          registryUsername: ${{ secrets.DOCKERHUB_USERNAME }}
-          registryPassword: ${{ secrets.DOCKERHUB_TOKEN  }}
-          containerAppName: farms-api
-          resourceGroup: bovinc-rg
-          imageToBuild: ${{ secrets.DOCKERHUB_USERNAME }}/farmsapi:${{ github.sha }}
-          
-
-     
 
