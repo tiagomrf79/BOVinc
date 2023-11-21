@@ -1,0 +1,43 @@
+name: Trigger auto deployment for animals-api
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ master ]
+    paths:
+    - 'AnimalsAPI/**'
+    - '.github/workflows/farms-api-AutoDeployTrigger-a9df2864-87ec-4c04-a5ed-d0d678a9435e.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:
+  
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: AnimalsAPI
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.FARMSAPI_AZURE_CREDENTIALS }}
+          
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          dockerfilePath: ./AnimalsAPI/Dockerfile
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: docker.io
+          registryUsername: ${{ secrets.DOCKERHUB_USERNAME }}
+          registryPassword: ${{ secrets.DOCKERHUB_TOKEN  }}
+          containerAppName: animals-api
+          resourceGroup: bovinc-rg
+          imageToBuild: ${{ secrets.DOCKERHUB_USERNAME }}/animalsapi:${{ github.sha }}
