@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AnimalsAPI</name>
+    </assembly>
+    <members>
+        <member name="M:AnimalsAPI.Controllers.AnimalController.Get(System.Int32)">
+            <param name="id">The ID of the animal to retrieve.</param>
+            <response code="200">Returns the requested animal.</response>
+        </member>
+        <member name="M:AnimalsAPI.Controllers.AnimalController.Get(AnimalsAPI.DTOs.SearchQueryDto{AnimalsAPI.DTOs.AnimalResponseDto})">
+            <param name="searchOptions">A DTO object that can be used to customize the data-retrieval parameters.</param>
+            <response code="200">Returns a list of animals.</response>
+        </member>
+        <member name="M:AnimalsAPI.Controllers.AnimalController.Post(AnimalsAPI.DTOs.AnimalUpdateDto)">
+            <param name="dtoReceived">A DTO object containing the data to create a new animal.</param>
+            <response code="201">Returns the newly created animal's ID.</response>
+        </member>
+        <member name="M:AnimalsAPI.Controllers.AnimalController.Put(System.Int32,AnimalsAPI.DTOs.AnimalUpdateDto)">
+            <param name="id">The ID of the animal to update.</param>
+            <param name="dtoReceived">A DTO object containing the properties to update in the selected animal.</param>
+        </member>
+        <member name="M:AnimalsAPI.Controllers.AnimalController.Delete(System.Int32)">
+            <param name="id">The ID of the animal to delete.</param>
+        </member>
+        <member name="T:AnimalsAPI.DTOs.AnimalUpdateDto">
+            <summary>
+            A DTO object containing the data to create a new animal.
+            </summary>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.AnimalUpdateDto.FarmId">
+            <summary>Farm ID</summary>
+            <example>5</example>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.AnimalUpdateDto.RegistrationId">
+            <summary>Registered identification</summary>
+            <example>PT393224973</example>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.AnimalUpdateDto.Name">
+            <summary>Name the animal responds to</summary>
+            <example>Marquesa</example>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.AnimalUpdateDto.Tag">
+            <summary>Farm identification tag</summary>
+            <example>4973</example>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.AnimalUpdateDto.DateOfBirth">
+            <summary>Date of birth</summary>
+            <example>14/10/2018</example>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.AnimalUpdateDto.MotherId">
+            <summary>ID of the mother if known</summary>
+            <example>PT193162686</example>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.AnimalUpdateDto.FatherId">
+            <summary>ID of the father if known</summary>
+            <example>PT193198478</example>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.SearchQueryDto`1.PageIndex">
+            <summary>Index of the page to return</summary>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.SearchQueryDto`1.PageSize">
+            <summary>Number of records per page</summary>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.SearchQueryDto`1.SortColumn">
+            <summary>Column for sort order</summary>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.SearchQueryDto`1.SortOrder">
+            <summary>Sort order</summary>
+        </member>
+        <member name="P:AnimalsAPI.DTOs.SearchQueryDto`1.FilterQuery">
+            <summary>Search string for name</summary>
+        </member>
+    </members>
+</doc>

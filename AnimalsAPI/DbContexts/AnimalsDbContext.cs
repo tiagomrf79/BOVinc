@@ -1,5 +1,6 @@
 ﻿using AnimalsAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace AnimalsAPI.DbContexts;
 
@@ -23,7 +24,7 @@ public class AnimalsDbContext : DbContext
         modelBuilder.Entity<Animal>().Property(a => a.Tag).HasMaxLength(10);
         modelBuilder.Entity<Animal>().Property(a => a.Gender).IsRequired().HasConversion(g => (int)g, g => (Gender)g);
         modelBuilder.Entity<Animal>().Property(a => a.Breed).IsRequired().HasConversion(b => (int)b, b => (Breed)b);
-        modelBuilder.Entity<Animal>().Property(a => a.DateOfBirth).IsRequired();
+        //modelBuilder.Entity<Animal>().Property(a => a.DateOfBirth).HasColumnType(DataType.Date).IsRequired();
         modelBuilder.Entity<Animal>().HasOne(a => a.Mother).WithMany().HasForeignKey(a => a.MotherId);
         modelBuilder.Entity<Animal>().HasOne(a => a.Father).WithMany().HasForeignKey(a => a.FatherId);
         modelBuilder.Entity<Animal>().Property(a => a.DateCreated).IsRequired();
