@@ -71,5 +71,17 @@
         <member name="P:AnimalsAPI.DTOs.SearchQueryDto`1.FilterQuery">
             <summary>Search string for name</summary>
         </member>
+        <member name="T:AnimalsAPI.Migrations.First">
+            <inheritdoc />
+        </member>
+        <member name="M:AnimalsAPI.Migrations.First.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:AnimalsAPI.Migrations.First.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:AnimalsAPI.Migrations.First.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>

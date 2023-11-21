@@ -1,9 +1,3 @@
 {
-  "dependencies": {
-    "redis1": {
-      "type": "redis",
-      "connectionId": "CacheConnection",
-      "dynamicId": null
-    }
-  }
+  "dependencies": {}
 }
