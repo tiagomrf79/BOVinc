@@ -1,6 +1,5 @@
 ﻿using AnimalsAPI.Models;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace AnimalsAPI.DbContexts;
 

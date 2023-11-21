@@ -59,7 +59,7 @@ public class SeedController : ControllerBase
         foreach (AnimalRecord csvRecord in recordsFromCsv)
         {
             // value from CSV is invalid
-            if (!csvRecord.Id.HasValue || string.IsNullOrEmpty(csvRecord.Name))
+            if (!csvRecord.Id.HasValue)
             {
                 skippedRows++;
                 continue;

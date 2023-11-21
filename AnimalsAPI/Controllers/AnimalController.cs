@@ -11,7 +11,7 @@ using System.Linq.Dynamic.Core;
 
 namespace AnimalsAPI.Controllers;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class AnimalController : ControllerBase
 {
