@@ -7,7 +7,7 @@ on:
     branches: 
       [ master ]
     paths:
-    - '**'
+    - 'FarmsAPI/**'
     - '.github/workflows/farms-api-AutoDeployTrigger-a9df2864-87ec-4c04-a5ed-d0d678a9435e.yml'
 
   # Allow manual trigger 
