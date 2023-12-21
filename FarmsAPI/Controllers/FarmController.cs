@@ -41,6 +41,7 @@ public class FarmController : ControllerBase
     [SwaggerOperation(Summary = "Get a single farm.", Description = "Retrieves a single farm with the given ID.")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(FarmResponseDto))]
     public async Task<ActionResult<FarmResponseDto>> Get(int id)
     {
         _logger.LogInformation("Attempting to get farm with ID {id}.", id);

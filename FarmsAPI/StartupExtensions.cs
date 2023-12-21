@@ -96,7 +96,8 @@ public static class StartupExtensions
 
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-        if (builder.Environment.IsDevelopment())
+        builder.Services.AddDistributedMemoryCache();
+        /*if (builder.Environment.IsDevelopment())
         {
             builder.Services.AddDistributedMemoryCache();
         }
@@ -106,7 +107,7 @@ public static class StartupExtensions
             {
                 options.Configuration = builder.Configuration.GetConnectionString("RedisCache") ?? throw new InvalidOperationException("Connection string 'RedisCache' not found.");
             });
-        }
+        }*/
 
         return builder.Build();
     }
