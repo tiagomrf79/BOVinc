@@ -22,6 +22,16 @@ services:
     depends_on:
       - seq_in_dc
 
+  dummyapi:
+    build:
+      context: .
+      dockerfile: DummyAPI/Dockerfile
+    ports:
+      - '8082:80'
+      - '8092:443'
+    depends_on:
+      - seq_in_dc
+
   seq_in_dc:
     image: datalust/seq
     ports:

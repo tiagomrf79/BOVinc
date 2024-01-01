@@ -9,6 +9,8 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalsAPI", "AnimalsAPI\AnimalsAPI.csproj", "{51419FCC-D6D7-42B1-A7B1-47EF9DF0B45C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummyAPI", "DummyAPI\DummyAPI.csproj", "{A50C99CB-B195-4279-8CC2-63C8593D5245}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{51419FCC-D6D7-42B1-A7B1-47EF9DF0B45C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51419FCC-D6D7-42B1-A7B1-47EF9DF0B45C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51419FCC-D6D7-42B1-A7B1-47EF9DF0B45C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A50C99CB-B195-4279-8CC2-63C8593D5245}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A50C99CB-B195-4279-8CC2-63C8593D5245}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A50C99CB-B195-4279-8CC2-63C8593D5245}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A50C99CB-B195-4279-8CC2-63C8593D5245}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
