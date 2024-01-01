@@ -24,9 +24,9 @@ public class MilkRecordingController : ControllerBase
 
     [HttpGet("Table", Name = "GetMilkRecordingsForTable")]
     [SwaggerOperation(Summary = "Gets data for a table with milk recordings for a given animal and lactation")]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of milk recordings", typeof(IEnumerable<MilkRecordsForTableDto>))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of milk recordings", typeof(IEnumerable<MilkRecordForTableDto>))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
-    public async Task<ActionResult<IEnumerable<MilkRecordsForTableDto>>> Get(
+    public async Task<ActionResult<IEnumerable<MilkRecordForTableDto>>> Get(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId,
         [FromQuery, SwaggerParameter("Lactation Number", Required = true)] int lactationId)
     {
@@ -55,9 +55,9 @@ public class MilkRecordingController : ControllerBase
             return NotFound(problemDetails);
         }
 
-        var milkRecords = new List<MilkRecordsDto>
+        var milkRecords = new List<MilkRecordDto>
         {
-            new MilkRecordsDto()
+            new MilkRecordDto()
             {
                 Id = 1,
                 Date = new DateOnly(2022,12,19),
@@ -66,7 +66,7 @@ public class MilkRecordingController : ControllerBase
                 Protein = 5.9,
                 SCC = 647
             },
-            new MilkRecordsDto()
+            new MilkRecordDto()
             {
                 Id = 2,
                 Date = new DateOnly(2023,1,2),
@@ -75,7 +75,7 @@ public class MilkRecordingController : ControllerBase
                 Protein = 3.7,
                 SCC = 457
             },
-            new MilkRecordsDto()
+            new MilkRecordDto()
             {
                 Id = 3,
                 Date = new DateOnly(2023,2,10),
@@ -84,7 +84,7 @@ public class MilkRecordingController : ControllerBase
                 Protein = 5,
                 SCC = 895
             },
-            new MilkRecordsDto()
+            new MilkRecordDto()
             {
                 Id = 4,
                 Date = new DateOnly(2023,3,18),
@@ -93,7 +93,7 @@ public class MilkRecordingController : ControllerBase
                 Protein = 5,
                 SCC = 442
             },
-            new MilkRecordsDto()
+            new MilkRecordDto()
             {
                 Id = 5,
                 Date = new DateOnly(2023,4,21),
@@ -102,7 +102,7 @@ public class MilkRecordingController : ControllerBase
                 Protein = 3.4,
                 SCC = 885
             },
-            new MilkRecordsDto()
+            new MilkRecordDto()
             {
                 Id = 6,
                 Date = new DateOnly(2023,5,3),
@@ -111,7 +111,7 @@ public class MilkRecordingController : ControllerBase
                 Protein = 5.2,
                 SCC = 586
             },
-            new MilkRecordsDto()
+            new MilkRecordDto()
             {
                 Id = 7,
                 Date = new DateOnly(2023,6,6),
@@ -120,7 +120,7 @@ public class MilkRecordingController : ControllerBase
                 Protein = 5.3,
                 SCC = 726
             },
-            new MilkRecordsDto()
+            new MilkRecordDto()
             {
                 Id = 8,
                 Date = new DateOnly(2023,7,13),
@@ -131,9 +131,9 @@ public class MilkRecordingController : ControllerBase
             }
         };
         
-        var listToReturn = new List<MilkRecordsForTableDto>()
+        var listToReturn = new List<MilkRecordForTableDto>()
         {
-            new MilkRecordsForTableDto()
+            new MilkRecordForTableDto()
             {
                 CalvingDate = new DateOnly(2022,11,26),
                 MilkRecords = milkRecords

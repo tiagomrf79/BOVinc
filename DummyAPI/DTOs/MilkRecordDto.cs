@@ -1,6 +1,6 @@
 ﻿namespace DummyAPI.DTOs;
 
-public class MilkRecordsDto
+public class MilkRecordDto
 {
     public int Id { get; set; }
     public DateOnly Date { get; set; }

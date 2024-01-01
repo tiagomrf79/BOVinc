@@ -24,9 +24,9 @@ public class LactationController : ControllerBase
 
     [HttpGet("Dropdown", Name = "GetLactationsForDropdown")]
     [SwaggerOperation(Summary = "Gets an animal lactation options for a dropdown")]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of lactation options", typeof(IEnumerable<OptionsForDropdownDto>))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of lactation options", typeof(IEnumerable<OptionForDropdownDto>))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
-    public async Task<ActionResult<IEnumerable<OptionsForDropdownDto>>> Get(
+    public async Task<ActionResult<IEnumerable<OptionForDropdownDto>>> Get(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId)
     {
         //if lactation was not found
@@ -45,12 +45,12 @@ public class LactationController : ControllerBase
             return NotFound(problemDetails);
         }
 
-        var listToReturn = new List<OptionsForDropdownDto>()
+        var listToReturn = new List<OptionForDropdownDto>()
         {
-            new OptionsForDropdownDto { Id = 1, Name = "3" },
-            new OptionsForDropdownDto { Id = 2, Name = "4" },
-            new OptionsForDropdownDto { Id = 3, Name = "5" },
-            new OptionsForDropdownDto { Id = 4, Name = "6" },
+            new OptionForDropdownDto { Id = 1, Name = "3" },
+            new OptionForDropdownDto { Id = 2, Name = "4" },
+            new OptionForDropdownDto { Id = 3, Name = "5" },
+            new OptionForDropdownDto { Id = 4, Name = "6" },
         };
 
         return Ok(listToReturn);
