@@ -2,6 +2,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
@@ -99,11 +100,14 @@ var app = builder.Build();
 app.UseSwagger(options =>
 {
     options.RouteTemplate = "swagger/{documentName}/swagger.json";
+    options.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+    {
+        swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" } };
+    });
 });
 
 app.UseSwaggerUI((options) =>
 {
-    //options.SwaggerEndpoint("/swagger/DummyOpenAPISpecification/swagger.json", "Dummy API");
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "Dummy API");
     options.RoutePrefix = string.Empty;
 });
