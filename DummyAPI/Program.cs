@@ -146,6 +146,7 @@ app.MapGet("/error",
         return Results.Problem(details);
     }).ExcludeFromDescription();
 
+//todo: check if i need the AnyOrigins
 app.MapControllers().RequireCors("AnyOrigin");
 
 app.UseSerilogRequestLogging();

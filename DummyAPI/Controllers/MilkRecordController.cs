@@ -23,6 +23,7 @@ public class MilkRecordController : ControllerBase
     }
 
     [HttpGet("Table", Name = "GetMilkRecordsForTable")]
+    //todo: check if I need AnyOrigin
     [EnableCors("AnyOrigin")]
     [SwaggerOperation(Summary = "Gets data for a table with milk records for a given animal and lactation")]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of milk records", typeof(MilkRecordForTableDto))]
