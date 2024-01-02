@@ -38,7 +38,20 @@ public class MilkRecordController : ControllerBase
         //so I can query the Lactations table using LactationId to get the calving date
 
 
-        //if lactation was not found
+        if (animalId == 0)
+        {
+            ProblemDetails problemDetails = new ProblemDetails
+            {
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
+                Title = "Record not found.",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"The animal with ID {animalId} does not exist."
+            };
+
+            _logger.LogInformation("The animal with ID {id} does not exist.", animalId);
+
+            return NotFound(problemDetails);
+        }
         if (lactationId == 0)
         {
             ProblemDetails problemDetails = new ProblemDetails
@@ -63,7 +76,9 @@ public class MilkRecordController : ControllerBase
                 Milk = 30.65,
                 Fat = 3.3,
                 Protein = 5.9,
-                SCC = 647
+                SCC = 647,
+                AnimalId = 1,
+                LactationId = 1
             },
             new MilkRecordDto()
             {
@@ -72,7 +87,9 @@ public class MilkRecordController : ControllerBase
                 Milk = 44.59,
                 Fat = 4.9,
                 Protein = 3.7,
-                SCC = 457
+                SCC = 457,
+                AnimalId = 1,
+                LactationId = 1
             },
             new MilkRecordDto()
             {
@@ -81,7 +98,9 @@ public class MilkRecordController : ControllerBase
                 Milk = 49.81,
                 Fat = 5.1,
                 Protein = 5,
-                SCC = 895
+                SCC = 895,
+                AnimalId = 1,
+                LactationId = 1
             },
             new MilkRecordDto()
             {
@@ -90,7 +109,9 @@ public class MilkRecordController : ControllerBase
                 Milk = 42.82,
                 Fat = 2.3,
                 Protein = 5,
-                SCC = 442
+                SCC = 442,
+                AnimalId = 1,
+                LactationId = 1
             },
             new MilkRecordDto()
             {
@@ -99,7 +120,9 @@ public class MilkRecordController : ControllerBase
                 Milk = 42.89,
                 Fat = 5.9,
                 Protein = 3.4,
-                SCC = 885
+                SCC = 885,
+                AnimalId = 1,
+                LactationId = 1
             },
             new MilkRecordDto()
             {
@@ -108,7 +131,9 @@ public class MilkRecordController : ControllerBase
                 Milk = 39.61,
                 Fat = 3.8,
                 Protein = 5.2,
-                SCC = 586
+                SCC = 586,
+                AnimalId = 1,
+                LactationId = 1
             },
             new MilkRecordDto()
             {
@@ -117,7 +142,9 @@ public class MilkRecordController : ControllerBase
                 Milk = 31.9,
                 Fat = 4.8,
                 Protein = 5.3,
-                SCC = 726
+                SCC = 726,
+                AnimalId = 1,
+                LactationId = 1
             },
             new MilkRecordDto()
             {
@@ -126,7 +153,9 @@ public class MilkRecordController : ControllerBase
                 Milk = 26,
                 Fat = 4.1,
                 Protein = 2.7,
-                SCC = 677
+                SCC = 677,
+                AnimalId = 1,
+                LactationId = 1
             }
         };
 
@@ -148,20 +177,12 @@ public class MilkRecordController : ControllerBase
     [SwaggerResponse(StatusCodes.Status201Created, "Returns Created")]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns a standard error response", typeof(ProblemDetails))]
     public async Task<ActionResult> Post(
-        [FromBody, SwaggerRequestBody("Data to create milk record", Required = true)] MilkRecordCreateDto dtoReceived)
+        [FromBody, SwaggerRequestBody("Data to create milk record", Required = true)] MilkRecordDto dtoReceived)
     {
-        var newEntity = new MilkRecordDto()
-        {
-            Id = 154,
-            Date = dtoReceived.Date,
-            Milk = dtoReceived.Milk,
-            Fat = dtoReceived.Fat,
-            Protein = dtoReceived.Protein,
-            SCC = dtoReceived.SCC
-        };
+        dtoReceived.Id = 154;
 
-        //return CreatedAtAction(nameof(Post), new { id = newEntity.Id }, newEntity);
-        return Ok();
+        return CreatedAtAction(nameof(Post), new { id = dtoReceived.Id }, dtoReceived);
+        //return Ok();
     }
 
 
@@ -171,7 +192,7 @@ public class MilkRecordController : ControllerBase
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns a standard error response", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
     public async Task<ActionResult> Put(
-        [FromBody, SwaggerRequestBody("Data to update milk record", Required = true)] MilkRecordUpdateDto dtoReceived)
+        [FromBody, SwaggerRequestBody("Data to update milk record", Required = true)] MilkRecordDto dtoReceived)
     {
         return Ok();
     }
