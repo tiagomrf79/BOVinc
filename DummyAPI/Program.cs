@@ -100,7 +100,8 @@ app.UseSwagger();
 
 app.UseSwaggerUI((options) =>
 {
-    options.SwaggerEndpoint("/swagger/DummyOpenAPISpecification/swagger.json", "Dummy API");
+    //options.SwaggerEndpoint("/swagger/DummyOpenAPISpecification/swagger.json", "Dummy API");
+    options.SwaggerEndpoint("/swagger.json", "Dummy API");
 });
 
 if (!app.Configuration.GetValue<bool>("UseDeveloperExceptionPage"))
