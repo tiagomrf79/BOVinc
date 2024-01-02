@@ -39,4 +39,4 @@ jobs:
           registryPassword: ${{ secrets.DOCKERHUB_TOKEN  }}
           containerAppName: dummy-api
           resourceGroup: bovinc-rg
-          imageToBuild: ${{ secrets.DOCKERHUB_USERNAME }}/dummyapi:${{ github.sha }}, ${{ secrets.DOCKERHUB_USERNAME }}/dummyapi:latest
+          imageToBuild: ${{ secrets.DOCKERHUB_USERNAME }}/dummyapi:${{ github.sha }}
