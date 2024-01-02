@@ -55,6 +55,4 @@ public class LactationController : ControllerBase
 
         return Ok(listToReturn);
     }
-
-
 }

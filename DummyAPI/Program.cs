@@ -39,7 +39,6 @@ builder.Host.UseSerilog((context, services, loggerConfiguration) =>
     }
 });
 
-
 builder.Services.AddCors((options) =>
 {
     options.AddDefaultPolicy(cfg =>
@@ -98,11 +97,11 @@ else
 var app = builder.Build();
 
 app.UseSwagger();
+
 app.UseSwaggerUI((options) =>
 {
     options.SwaggerEndpoint("/swagger/DummyOpenAPISpecification/swagger.json", "Dummy API");
 });
-
 
 if (!app.Configuration.GetValue<bool>("UseDeveloperExceptionPage"))
 {

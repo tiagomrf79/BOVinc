@@ -8,23 +8,22 @@ namespace DummyAPI.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Produces("application/json")]
-public class MilkRecordingController : ControllerBase
+public class MilkRecordController : ControllerBase
 {
     private static readonly SemaphoreSlim semaphore = new(1, 1);
 
-    private readonly ILogger<MilkRecordingController> _logger;
+    private readonly ILogger<MilkRecordController> _logger;
     private readonly IDistributedCache _distributedCache;
 
-    public MilkRecordingController(ILogger<MilkRecordingController> logger, IDistributedCache distributedCache)
+    public MilkRecordController(ILogger<MilkRecordController> logger, IDistributedCache distributedCache)
     {
         _logger = logger;
         _distributedCache = distributedCache;
     }
 
-
-    [HttpGet("Table", Name = "GetMilkRecordingsForTable")]
-    [SwaggerOperation(Summary = "Gets data for a table with milk recordings for a given animal and lactation")]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of milk recordings", typeof(IEnumerable<MilkRecordForTableDto>))]
+    [HttpGet("Table", Name = "GetMilkRecordsForTable")]
+    [SwaggerOperation(Summary = "Gets data for a table with milk records for a given animal and lactation")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of milk records", typeof(IEnumerable<MilkRecordForTableDto>))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
     public async Task<ActionResult<IEnumerable<MilkRecordForTableDto>>> Get(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId,
@@ -130,7 +129,7 @@ public class MilkRecordingController : ControllerBase
                 SCC = 677
             }
         };
-        
+
         var listToReturn = new List<MilkRecordForTableDto>()
         {
             new MilkRecordForTableDto()
@@ -141,12 +140,5 @@ public class MilkRecordingController : ControllerBase
         };
 
         return Ok(listToReturn);
-    }
-
-    // GET api/<MilkRecordingController>/5
-    [HttpGet("{id}")]
-    public string Get(int id)
-    {
-        return "value";
     }
 }
