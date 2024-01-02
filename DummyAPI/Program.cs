@@ -68,7 +68,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen((options) =>
 {
-    options.SwaggerDoc("DummyOpenAPISpecification", new()
+    options.SwaggerDoc("v1", new()
     {
         Version = "v1",
         Title = "Dummy API",
@@ -96,12 +96,16 @@ else
 
 var app = builder.Build();
 
-app.UseSwagger();
+app.UseSwagger(options =>
+{
+    options.RouteTemplate = "swagger/{documentName}/swagger.json";
+});
 
 app.UseSwaggerUI((options) =>
 {
     //options.SwaggerEndpoint("/swagger/DummyOpenAPISpecification/swagger.json", "Dummy API");
-    options.SwaggerEndpoint("/swagger.json", "Dummy API");
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Dummy API");
+    options.RoutePrefix = string.Empty;
 });
 
 if (!app.Configuration.GetValue<bool>("UseDeveloperExceptionPage"))
