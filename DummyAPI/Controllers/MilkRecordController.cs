@@ -160,7 +160,8 @@ public class MilkRecordController : ControllerBase
             SCC = dtoReceived.SCC
         };
 
-        return CreatedAtAction(nameof(Post), new { id = newEntity.Id }, newEntity);
+        //return CreatedAtAction(nameof(Post), new { id = newEntity.Id }, newEntity);
+        return Ok();
     }
 
 
