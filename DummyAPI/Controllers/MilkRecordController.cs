@@ -210,9 +210,9 @@ public class MilkRecordController : ControllerBase
 
     [HttpGet("Chart", Name = "GetMilkRecordsForChart")]
     [SwaggerOperation(Summary = "Gets data for a chart with milk records for a given animal and lactation")]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of actual and predicted milk records", typeof(MilkRecordForTableDto))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of actual and predicted milk records", typeof(MilkRecordForChartDto))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
-    public async Task<ActionResult<MilkRecordForTableDto>> GetForChart(
+    public async Task<ActionResult<MilkRecordForChartDto>> GetForChart(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId,
         [FromQuery, SwaggerParameter("Lactation Number", Required = true)] int lactationId)
     {
@@ -255,9 +255,9 @@ public class MilkRecordController : ControllerBase
 
     [HttpGet("Total", Name = "GetMilkTotals")]
     [SwaggerOperation(Summary = "Gets total production for a given animal and lactation")]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of actual and predicted total productions", typeof(IEnumerable<MilkRecordForTableDto>))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of actual and predicted total productions", typeof(IEnumerable<MilkTotalForTableDto>))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
-    public async Task<ActionResult<IEnumerable<MilkRecordForTableDto>>> GetTotals(
+    public async Task<ActionResult<IEnumerable<MilkTotalForTableDto>>> GetTotals(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId,
         [FromQuery, SwaggerParameter("Lactation Number", Required = true)] int lactationId)
     {
