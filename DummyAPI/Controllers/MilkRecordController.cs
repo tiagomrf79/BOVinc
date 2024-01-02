@@ -179,13 +179,14 @@ public class MilkRecordController : ControllerBase
     }
 
 
-    [HttpPut(Name = "UpdateMilkRecord")]
+    [HttpPut("{id:int}", Name = "UpdateMilkRecord")]
     [SwaggerOperation(Summary = "Updates a milk record")]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns OK")]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns a standard error response", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
     public async Task<ActionResult> Put(
-        [FromBody, SwaggerRequestBody("Data to update milk record", Required = true)] MilkRecordUpdateDto dtoReceived)
+        [FromQuery, SwaggerParameter("Milk Record ID", Required = true)] int id,
+        [FromBody, SwaggerRequestBody("Data to update milk record", Required = true)] MilkRecordCreateDto dtoReceived)
     {
         return Ok();
     }
