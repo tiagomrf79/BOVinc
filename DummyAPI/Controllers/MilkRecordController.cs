@@ -150,21 +150,6 @@ public class MilkRecordController : ControllerBase
     public async Task<ActionResult> Post(
         [FromBody, SwaggerRequestBody("Data to create milk record", Required = true)] MilkRecordCreateDto dtoReceived)
     {
-        if (dtoReceived.AnimalId == 0 || dtoReceived.LactationId == 0)
-        {
-            ProblemDetails problemDetails = new ProblemDetails
-            {
-                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
-                Title = "Record not found.",
-                Status = StatusCodes.Status404NotFound,
-                Detail = $"The animal with ID {dtoReceived.AnimalId} does not exist."
-            };
-
-            _logger.LogInformation("The animal with ID {dtoReceived.AnimalId} does not exist.", dtoReceived);
-
-            return NotFound(problemDetails);
-        }
-
         var newEntity = new MilkRecordDto()
         {
             Id = 154,
@@ -179,14 +164,13 @@ public class MilkRecordController : ControllerBase
     }
 
 
-    [HttpPut("{id:int}", Name = "UpdateMilkRecord")]
+    [HttpPut(Name = "UpdateMilkRecord")]
     [SwaggerOperation(Summary = "Updates a milk record")]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns OK")]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns a standard error response", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
     public async Task<ActionResult> Put(
-        [FromQuery, SwaggerParameter("Milk Record ID", Required = true)] int id,
-        [FromBody, SwaggerRequestBody("Data to update milk record", Required = true)] MilkRecordCreateDto dtoReceived)
+        [FromBody, SwaggerRequestBody("Data to update milk record", Required = true)] MilkRecordUpdateDto dtoReceived)
     {
         return Ok();
     }
