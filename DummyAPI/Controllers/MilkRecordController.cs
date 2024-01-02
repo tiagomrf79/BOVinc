@@ -145,9 +145,9 @@ public class MilkRecordController : ControllerBase
 
     [HttpPost(Name = "CreateMilkRecord")]
     [SwaggerOperation(Summary = "Creates a new milk record")]
-    [SwaggerResponse(StatusCodes.Status201Created, "Returns the newly created milk record ID", typeof(int))]
+    [SwaggerResponse(StatusCodes.Status201Created, "Returns Created")]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns a standard error response", typeof(ProblemDetails))]
-    public async Task<ActionResult<int>> Post(
+    public async Task<ActionResult> Post(
         [FromBody, SwaggerRequestBody("Data to create milk record", Required = true)] MilkRecordCreateDto dtoReceived)
     {
         if (dtoReceived.AnimalId == 0 || dtoReceived.LactationId == 0)
@@ -165,9 +165,17 @@ public class MilkRecordController : ControllerBase
             return NotFound(problemDetails);
         }
 
-        int newId = 155;
+        var newEntity = new MilkRecordDto()
+        {
+            Id = 154,
+            Date = dtoReceived.Date,
+            Milk = dtoReceived.Milk,
+            Fat = dtoReceived.Fat,
+            Protein = dtoReceived.Protein,
+            SCC = dtoReceived.SCC
+        };
 
-        return CreatedAtAction(nameof(Post), new { id = newId }, newId);
+        return CreatedAtAction(nameof(Post), new { id = newEntity.Id }, newEntity);
     }
 
 
@@ -176,7 +184,7 @@ public class MilkRecordController : ControllerBase
     [SwaggerResponse(StatusCodes.Status200OK, "Returns OK")]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns a standard error response", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
-    public async Task<ActionResult<int>> Put(
+    public async Task<ActionResult> Put(
         [FromBody, SwaggerRequestBody("Data to update milk record", Required = true)] MilkRecordUpdateDto dtoReceived)
     {
         return Ok();
@@ -186,7 +194,7 @@ public class MilkRecordController : ControllerBase
     [SwaggerOperation(Summary = "Deletes a milk record")]
     [SwaggerResponse(StatusCodes.Status204NoContent, "Returns NoContent")]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
-    public async Task<ActionResult<int>> Delete(
+    public async Task<ActionResult> Delete(
         [FromQuery, SwaggerParameter("Milk Record ID", Required = true)] int milkRecordId)
     {
         return NoContent();
