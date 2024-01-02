@@ -124,6 +124,8 @@ else
 
 app.UseHttpsRedirection();
 
+app.UseCors();
+
 app.UseAuthorization();
 
 app.MapGet("/error",
@@ -144,7 +146,7 @@ app.MapGet("/error",
         return Results.Problem(details);
     }).ExcludeFromDescription();
 
-app.MapControllers();
+app.MapControllers().RequireCors("AnyOrigin");
 
 app.UseSerilogRequestLogging();
 
