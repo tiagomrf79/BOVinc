@@ -23,9 +23,9 @@ public class MilkRecordController : ControllerBase
 
     [HttpGet("Table", Name = "GetMilkRecordsForTable")]
     [SwaggerOperation(Summary = "Gets data for a table with milk records for a given animal and lactation")]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of milk records", typeof(IEnumerable<MilkRecordForTableDto>))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of milk records", typeof(MilkRecordForTableDto))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
-    public async Task<ActionResult<IEnumerable<MilkRecordForTableDto>>> Get(
+    public async Task<ActionResult<MilkRecordForTableDto>> Get(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId,
         [FromQuery, SwaggerParameter("Lactation Number", Required = true)] int lactationId)
     {
@@ -159,16 +159,13 @@ public class MilkRecordController : ControllerBase
             }
         };
 
-        var listToReturn = new List<MilkRecordForTableDto>()
+        var dtoToReturn = new MilkRecordForTableDto()
         {
-            new MilkRecordForTableDto()
-            {
-                CalvingDate = new DateOnly(2022,11,26),
-                MilkRecords = milkRecords
-            }
+            CalvingDate = new DateOnly(2022, 11, 26),
+            MilkRecords = milkRecords
         };
 
-        return Ok(listToReturn);
+        return Ok(dtoToReturn);
     }
     
 
