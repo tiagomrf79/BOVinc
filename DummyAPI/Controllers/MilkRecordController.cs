@@ -28,7 +28,7 @@ public class MilkRecordController : ControllerBase
     [SwaggerOperation(Summary = "Gets data for a table with milk records for a given animal and lactation")]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of milk records", typeof(MilkRecordForTableDto))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
-    public async Task<ActionResult<MilkRecordForTableDto>> Get(
+    public async Task<ActionResult<MilkRecordForTableDto>> GetForTable(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId,
         [FromQuery, SwaggerParameter("Lactation Number", Required = true)] int lactationId)
     {
@@ -208,4 +208,68 @@ public class MilkRecordController : ControllerBase
     }
 
 
+    [HttpGet("Chart", Name = "GetMilkRecordsForChart")]
+    [SwaggerOperation(Summary = "Gets data for a chart with milk records for a given animal and lactation")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of actual and predicted milk records", typeof(MilkRecordForTableDto))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
+    public async Task<ActionResult<MilkRecordForTableDto>> GetForChart(
+        [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId,
+        [FromQuery, SwaggerParameter("Lactation Number", Required = true)] int lactationId)
+    {
+        var actualMilkRecords = new List<MilkOnlyRecordDto>
+        {
+            new MilkOnlyRecordDto() { Id = 1, Date = new DateOnly(2022,12,19), Milk = 30.65 },
+            new MilkOnlyRecordDto() { Id = 2, Date = new DateOnly(2023,1,2), Milk = 44.59 },
+            new MilkOnlyRecordDto() { Id = 3, Date = new DateOnly(2023,2,10), Milk = 49.81 },
+            new MilkOnlyRecordDto() { Id = 4, Date = new DateOnly(2023,3,18), Milk = 42.82 },
+            new MilkOnlyRecordDto() { Id = 5, Date = new DateOnly(2023,4,21), Milk = 42.89 },
+            new MilkOnlyRecordDto() { Id = 6, Date = new DateOnly(2023,5,3), Milk = 39.61 },
+            new MilkOnlyRecordDto() { Id = 7, Date = new DateOnly(2023,6,6), Milk = 31.9 },
+            new MilkOnlyRecordDto() { Id = 8, Date = new DateOnly(2023,7,13), Milk = 26 }
+        };
+
+        var predictedMilkRecords = new List<MilkOnlyRecordDto>
+        {
+            new MilkOnlyRecordDto() { Id = 1, Date = new DateOnly(2022,12,1), Milk = 30 },
+            new MilkOnlyRecordDto() { Id = 2, Date = new DateOnly(2023,1,1), Milk = 44 },
+            new MilkOnlyRecordDto() { Id = 3, Date = new DateOnly(2023,2,1), Milk = 51 },
+            new MilkOnlyRecordDto() { Id = 4, Date = new DateOnly(2023,3,1), Milk = 44 },
+            new MilkOnlyRecordDto() { Id = 5, Date = new DateOnly(2023,4,1), Milk = 43 },
+            new MilkOnlyRecordDto() { Id = 6, Date = new DateOnly(2023,5,1), Milk = 40 },
+            new MilkOnlyRecordDto() { Id = 7, Date = new DateOnly(2023,6,1), Milk = 32 },
+            new MilkOnlyRecordDto() { Id = 8, Date = new DateOnly(2023,7,1), Milk = 27 },
+            new MilkOnlyRecordDto() { Id = 8, Date = new DateOnly(2023,8,1), Milk = 23 },
+            new MilkOnlyRecordDto() { Id = 8, Date = new DateOnly(2023,9,1), Milk = 15 }
+        };
+
+        var dtoToReturn = new MilkRecordForChartDto()
+        {
+            CalvingDate = new DateOnly(2022, 11, 26),
+            ActualMilkRecords = actualMilkRecords,
+            PredictedMilkRecords = predictedMilkRecords
+        };
+
+        return Ok(dtoToReturn);
+    }
+
+
+    [HttpGet("Total", Name = "GetMilkTotals")]
+    [SwaggerOperation(Summary = "Gets total production for a given animal and lactation")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of actual and predicted total productions", typeof(IEnumerable<MilkRecordForTableDto>))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
+    public async Task<ActionResult<IEnumerable<MilkRecordForTableDto>>> GetTotals(
+        [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId,
+        [FromQuery, SwaggerParameter("Lactation Number", Required = true)] int lactationId)
+    {
+        var atualTotals = new List<MilkTotalDto>() { new MilkTotalDto() { Milk = 10469, Fat = 202, Protein = 312 } };
+        var adjustedTotals = new List<MilkTotalDto>() { new MilkTotalDto() { Milk = 12485, Fat = 250, Protein = 392 } };
+
+        var listToReturn = new List<MilkTotalForTableDto>()
+        {
+            new MilkTotalForTableDto() { Order = 1, Name = "Actual production", MilkTotals = atualTotals },
+            new MilkTotalForTableDto() { Order = 2, Name = "Adjusted to 305 days", MilkTotals = adjustedTotals }
+        };
+
+        return Ok(listToReturn);
+    }
 }

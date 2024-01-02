@@ -55,4 +55,23 @@ public class HerdChangesController : ControllerBase
         return Ok(listToReturn);
     }
 
+
+    [HttpGet("GroupDropdown", Name = "GetGroupsForDropdown")]
+    [SwaggerOperation(Summary = "Gets group options for a dropdown")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of group options", typeof(IEnumerable<OptionForDropdownDto>))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
+    public async Task<ActionResult<IEnumerable<OptionForDropdownDto>>> GetGroups()
+    {
+        var listToReturn = new List<OptionForDropdownDto>()
+        {
+            new OptionForDropdownDto { Id = 1, Name = "Milking Cows" },
+            new OptionForDropdownDto { Id = 2, Name = "Dry Cows" },
+            new OptionForDropdownDto { Id = 3, Name = "Older Heifers" },
+            new OptionForDropdownDto { Id = 4, Name = "Younger Heifers" },
+            new OptionForDropdownDto { Id = 4, Name = "Calves" }
+        };
+
+        return Ok(listToReturn);
+    }
+
 }
