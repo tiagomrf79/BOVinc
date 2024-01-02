@@ -1,4 +1,5 @@
 ﻿using DummyAPI.DTOs;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Swashbuckle.AspNetCore.Annotations;
@@ -22,6 +23,7 @@ public class MilkRecordController : ControllerBase
     }
 
     [HttpGet("Table", Name = "GetMilkRecordsForTable")]
+    [EnableCors("AnyOrigin")]
     [SwaggerOperation(Summary = "Gets data for a table with milk records for a given animal and lactation")]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns calving date and a list of milk records", typeof(MilkRecordForTableDto))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
