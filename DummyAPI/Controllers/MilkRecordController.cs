@@ -148,7 +148,7 @@ public class MilkRecordController : ControllerBase
     [SwaggerResponse(StatusCodes.Status201Created, "Returns the newly created milk record ID", typeof(int))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns a standard error response", typeof(ProblemDetails))]
     public async Task<ActionResult<int>> Post(
-        [FromBody, SwaggerParameter("Data to create milk record", Required = true)] MilkRecordCreateDto dtoReceived)
+        [FromBody, SwaggerRequestBody("Data to create milk record", Required = true)] MilkRecordCreateDto dtoReceived)
     {
         if (dtoReceived.AnimalId == 0 || dtoReceived.LactationId == 0)
         {
@@ -177,7 +177,7 @@ public class MilkRecordController : ControllerBase
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Returns a standard error response", typeof(ProblemDetails))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
     public async Task<ActionResult<int>> Put(
-        [FromBody, SwaggerParameter("Data to update milk record", Required = true)] MilkRecordUpdateDto dtoReceived)
+        [FromBody, SwaggerRequestBody("Data to update milk record", Required = true)] MilkRecordUpdateDto dtoReceived)
     {
         return Ok();
     }
@@ -187,7 +187,7 @@ public class MilkRecordController : ControllerBase
     [SwaggerResponse(StatusCodes.Status204NoContent, "Returns NoContent")]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
     public async Task<ActionResult<int>> Delete(
-        [FromQuery, SwaggerParameter("Milk record ID", Required = true)] int milkRecordId)
+        [FromQuery, SwaggerParameter("Milk Record ID", Required = true)] int milkRecordId)
     {
         return NoContent();
     }
