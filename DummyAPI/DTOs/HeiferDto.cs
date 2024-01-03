@@ -1,6 +1,6 @@
 ﻿namespace DummyAPI.DTOs;
 
-public class HeiferForTableDto
+public class HeiferDto
 {
     public int BreedingStatusId { get; set; }
     public string BreedingStatus { get; set; } = string.Empty;

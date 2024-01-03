@@ -15,6 +15,14 @@ public class SearchQueryDto<T> : IValidatableObject
     [DefaultValue(10)]
     public int PageSize { get; set; } = 10;
 
+    /// <summary>Column for sort order</summary>
+    [DefaultValue("Name")]
+    public string? SortColumn { get; set; } = "Name";
+
+    /// <summary>Sort order</summary>
+    [DefaultValue("ASC")]
+    public string? SortOrder { get; set; } = "ASC";
+
     /// <summary>Search string</summary>
     [DefaultValue(null)]
     public string? FilterQuery { get; set; } = null;
@@ -22,6 +30,23 @@ public class SearchQueryDto<T> : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         List<ValidationResult> results = new();
+
+        Type entityType = typeof(T);
+        if (entityType != null)
+        {
+            if (!entityType.GetProperties().Any(p => p.Name.ToLower() == SortColumn!.ToLower()))
+            {
+                ValidationResult result = new("Value must match an existing column.", new[] { nameof(SortColumn) });
+                results.Add(result);
+            }
+        }
+
+        if (SortOrder != "ASC" && SortOrder != "DESC")
+        {
+            ValidationResult result = new("Value must be one of the following: ASC, DESC.", new[] { nameof(SortOrder) });
+            results.Add(result);
+        }
+
         return results;
     }
 }

@@ -1,8 +1,8 @@
 ﻿using DummyAPI.DTOs;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Linq.Dynamic.Core;
 
 namespace DummyAPI.Controllers;
 
@@ -25,15 +25,14 @@ public class AnimalController : ControllerBase
 
 
     [HttpGet("Table", Name = "GetAllAnimalsForTable")]
-    //todo: check if I need AnyOrigin
     [SwaggerOperation(Summary = "Retrieves a list of animals with custom paging, sorting, and filtering rules.")]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of animals", typeof(IEnumerable<AnimalForTableDto>))]
-    public async Task<ActionResult<IEnumerable<AnimalForTableDto>>> GetAll(
-        [FromQuery, SwaggerParameter("Object with search and pagination options", Required = true)] SearchQueryDto<AnimalForTableDto> searchQuery)
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of animals and the total number of records", typeof(AnimalForTableDto))]
+    public async Task<ActionResult<AnimalForTableDto>> GetAll(
+        [FromQuery, SwaggerParameter("Object with search, sort and pagination options", Required = true)] SearchQueryDto<AnimalDto> searchQuery)
     {
-        var listToReturn = new List<AnimalForTableDto>()
+        var existingAnimals = new List<AnimalDto>()
         {
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 1,
                 RegistrationId = "PT 219 144848",
@@ -46,7 +45,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 3,
                 Category = "Milking Cows"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 2,
                 RegistrationId = "PT 266 483932",
@@ -59,7 +58,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 2,
                 Category = "Dry Cows"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 3,
                 RegistrationId = "PT 829 999162",
@@ -72,7 +71,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 3,
                 Category = "Milking Cows"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 4,
                 RegistrationId = "PT 337 386951",
@@ -85,7 +84,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 3,
                 Category = "Milking Cows"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 5,
                 RegistrationId = "PT 454 199443",
@@ -98,7 +97,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 3,
                 Category = "Milking Cows"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 6,
                 RegistrationId = "PT 536 445260",
@@ -111,7 +110,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 3,
                 Category = "Milking Cows"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 7,
                 RegistrationId = "PT 437 619249",
@@ -124,7 +123,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 3,
                 Category = "Milking Cows"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 8,
                 RegistrationId = "PT 404 653293",
@@ -137,7 +136,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 4,
                 Category = "Dry Cows"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 9,
                 RegistrationId = "PT 394 975382",
@@ -150,7 +149,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 2,
                 Category = "Heifers"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 10,
                 RegistrationId = "PT 295 977381",
@@ -163,7 +162,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 1,
                 Category = "Calves"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 11,
                 RegistrationId = "PT 955 960691",
@@ -176,7 +175,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 1,
                 Category = "Calves"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 12,
                 RegistrationId = "PT 476 545412",
@@ -189,7 +188,7 @@ public class AnimalController : ControllerBase
                 CategoryId = 2,
                 Category = "Heifers"
             },
-            new AnimalForTableDto()
+            new AnimalDto()
             {
                 Id = 13,
                 RegistrationId = "PT 119 264935",
@@ -204,6 +203,26 @@ public class AnimalController : ControllerBase
             },
         };
 
-        return Ok(listToReturn);
+        IQueryable<AnimalDto> query = existingAnimals.AsQueryable();
+
+        if (!string.IsNullOrEmpty(searchQuery.FilterQuery))
+            query = query.Where(h => 
+                h.Name.Contains(searchQuery.FilterQuery)
+                || h.RegistrationId.Contains(searchQuery.FilterQuery));
+
+        query = query
+            .OrderBy($"{searchQuery.SortColumn} {searchQuery.SortOrder}")
+            .Skip(searchQuery.PageIndex * searchQuery.PageSize)
+            .Take(searchQuery.PageSize);
+
+        var listToReturn = query.ToList();
+
+        var dtoToReturn = new AnimalForTableDto()
+        {
+            MaxRecords = 10,
+            Animals = listToReturn
+        };
+
+        return Ok(dtoToReturn);
     }
 }
