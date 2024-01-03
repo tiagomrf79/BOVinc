@@ -36,7 +36,7 @@ public class AnimalQueryDto<T> : IValidatableObject
 
     /// <summary>Sort order</summary>
     [DefaultValue("ASC")]
-    public string? SortOrder { get; set; } = "ASC";
+    public string? SortDirection { get; set; } = "ASC";
 
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -53,9 +53,9 @@ public class AnimalQueryDto<T> : IValidatableObject
             }
         }
 
-        if (SortOrder != "ASC" && SortOrder != "DESC")
+        if (SortDirection != "ASC" && SortDirection != "DESC")
         {
-            ValidationResult result = new("Value must be one of the following: ASC, DESC.", new[] { nameof(SortOrder) });
+            ValidationResult result = new("Value must be one of the following: ASC, DESC.", new[] { nameof(SortDirection) });
             results.Add(result);
         }
 

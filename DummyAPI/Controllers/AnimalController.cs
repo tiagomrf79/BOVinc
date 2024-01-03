@@ -219,8 +219,8 @@ public class AnimalController : ControllerBase
         int totalCount = query.Count();
 
         query = query
-            .OrderBy($"{searchQuery.SortAttribute} {searchQuery.SortOrder}")
-            .Skip(searchQuery.StartIndex * searchQuery.MaxRecords)
+            .OrderBy($"{searchQuery.SortAttribute} {searchQuery.SortDirection}")
+            .Skip(searchQuery.StartIndex)
             .Take(searchQuery.MaxRecords);
 
         var listToReturn = query.ToList();

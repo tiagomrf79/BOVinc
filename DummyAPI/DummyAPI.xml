@@ -22,7 +22,7 @@
         <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.SortAttribute">
             <summary>Sort attribute</summary>
         </member>
-        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.SortOrder">
+        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.SortDirection">
             <summary>Sort order</summary>
         </member>
     </members>
