@@ -4,5 +4,14 @@
         <name>DummyAPI</name>
     </assembly>
     <members>
+        <member name="P:DummyAPI.DTOs.SearchQueryDto`1.PageIndex">
+            <summary>Index of the page to return</summary>
+        </member>
+        <member name="P:DummyAPI.DTOs.SearchQueryDto`1.PageSize">
+            <summary>Number of records per page</summary>
+        </member>
+        <member name="P:DummyAPI.DTOs.SearchQueryDto`1.FilterQuery">
+            <summary>Search string</summary>
+        </member>
     </members>
 </doc>
