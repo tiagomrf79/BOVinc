@@ -4,14 +4,26 @@
         <name>DummyAPI</name>
     </assembly>
     <members>
-        <member name="P:DummyAPI.DTOs.SearchQueryDto`1.PageIndex">
-            <summary>Index of the page to return</summary>
+        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.SearchKeyword">
+            <summary>Search string</summary>
         </member>
-        <member name="P:DummyAPI.DTOs.SearchQueryDto`1.PageSize">
+        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.BreedFilter">
+            <summary>Filter for breed</summary>
+        </member>
+        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.GenderFilter">
+            <summary>Filter for gender</summary>
+        </member>
+        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.StartIndex">
+            <summary>Initial index to start pagination</summary>
+        </member>
+        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.MaxRecords">
             <summary>Number of records per page</summary>
         </member>
-        <member name="P:DummyAPI.DTOs.SearchQueryDto`1.FilterQuery">
-            <summary>Search string</summary>
+        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.SortAttribute">
+            <summary>Sort attribute</summary>
+        </member>
+        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.SortOrder">
+            <summary>Sort order</summary>
         </member>
     </members>
 </doc>

@@ -28,7 +28,7 @@ public class AnimalController : ControllerBase
     [SwaggerOperation(Summary = "Retrieves a list of animals with custom paging, sorting, and filtering rules.")]
     [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of animals and the total number of records", typeof(AnimalForTableDto))]
     public async Task<ActionResult<AnimalForTableDto>> GetAll(
-        [FromQuery, SwaggerParameter("Object with search, sort and pagination options", Required = true)] SearchQueryDto<AnimalDto> searchQuery)
+        [FromQuery, SwaggerParameter("Object with search, sort and pagination options", Required = true)] AnimalQueryDto<AnimalDto> searchQuery)
     {
         var existingAnimals = new List<AnimalDto>()
         {
@@ -205,21 +205,29 @@ public class AnimalController : ControllerBase
 
         IQueryable<AnimalDto> query = existingAnimals.AsQueryable();
 
-        if (!string.IsNullOrEmpty(searchQuery.FilterQuery))
+        if (!string.IsNullOrEmpty(searchQuery.SearchKeyword))
             query = query.Where(h => 
-                h.Name.Contains(searchQuery.FilterQuery)
-                || h.RegistrationId.Contains(searchQuery.FilterQuery));
+                h.Name.IndexOf(searchQuery.SearchKeyword, StringComparison.OrdinalIgnoreCase) != -1
+                || h.RegistrationId.IndexOf(searchQuery.SearchKeyword, StringComparison.OrdinalIgnoreCase) != -1);
+
+        if (searchQuery.GenderFilter > 0)
+            query = query.Where(a => a.GenderId == searchQuery.GenderFilter);
+
+        if (searchQuery.BreedFilter > 0)
+            query = query.Where(a => a.BreedId == searchQuery.BreedFilter);
+
+        int totalCount = query.Count();
 
         query = query
-            .OrderBy($"{searchQuery.SortColumn} {searchQuery.SortOrder}")
-            .Skip(searchQuery.PageIndex * searchQuery.PageSize)
-            .Take(searchQuery.PageSize);
+            .OrderBy($"{searchQuery.SortAttribute} {searchQuery.SortOrder}")
+            .Skip(searchQuery.StartIndex * searchQuery.MaxRecords)
+            .Take(searchQuery.MaxRecords);
 
         var listToReturn = query.ToList();
 
         var dtoToReturn = new AnimalForTableDto()
         {
-            MaxRecords = 10,
+            TotalCount = totalCount,
             Animals = listToReturn
         };
 

@@ -3,29 +3,41 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DummyAPI.DTOs;
 
-public class SearchQueryDto<T> : IValidatableObject
+public class AnimalQueryDto<T> : IValidatableObject
 {
-    /// <summary>Index of the page to return</summary>
+    /// <summary>Search string</summary>
+    [DefaultValue(null)]
+    public string? SearchKeyword { get; set; } = null;
+
+
+    /// <summary>Filter for breed</summary>
+    [DefaultValue(0)]
+    public int BreedFilter { get; set; } = 0;
+
+    /// <summary>Filter for gender</summary>
+    [DefaultValue(0)]
+    public int GenderFilter { get; set; } = 0;
+
+
+    /// <summary>Initial index to start pagination</summary>
     [Range(0, int.MaxValue)]
     [DefaultValue(0)]
-    public int PageIndex { get; set; } = 0;
+    public int StartIndex { get; set; } = 0;
 
     /// <summary>Number of records per page</summary>
     [Range(1, 100)]
     [DefaultValue(10)]
-    public int PageSize { get; set; } = 10;
+    public int MaxRecords { get; set; } = 10;
 
-    /// <summary>Column for sort order</summary>
+
+    /// <summary>Sort attribute</summary>
     [DefaultValue("Name")]
-    public string? SortColumn { get; set; } = "Name";
+    public string? SortAttribute { get; set; } = "Name";
 
     /// <summary>Sort order</summary>
     [DefaultValue("ASC")]
     public string? SortOrder { get; set; } = "ASC";
 
-    /// <summary>Search string</summary>
-    [DefaultValue(null)]
-    public string? FilterQuery { get; set; } = null;
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -34,9 +46,9 @@ public class SearchQueryDto<T> : IValidatableObject
         Type entityType = typeof(T);
         if (entityType != null)
         {
-            if (!entityType.GetProperties().Any(p => p.Name.ToLower() == SortColumn!.ToLower()))
+            if (!entityType.GetProperties().Any(p => p.Name.ToLower() == SortAttribute!.ToLower()))
             {
-                ValidationResult result = new("Value must match an existing column.", new[] { nameof(SortColumn) });
+                ValidationResult result = new("Value must match an existing column.", new[] { nameof(SortAttribute) });
                 results.Add(result);
             }
         }
