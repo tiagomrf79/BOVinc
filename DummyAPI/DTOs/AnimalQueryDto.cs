@@ -10,15 +10,20 @@ public class AnimalQueryDto<T> : IValidatableObject
     public string? SearchKeyword { get; set; } = null;
 
 
+    /// <summary>Filter for gender</summary>
+    [Required]
+    [DefaultValue(0)]
+    public int GenderFilter { get; set; } = 0;
+
     /// <summary>Filter for breed</summary>
     [Required]
     [DefaultValue(0)]
     public int BreedFilter { get; set; } = 0;
 
-    /// <summary>Filter for gender</summary>
+    /// <summary>Filter for animal category</summary>
     [Required]
     [DefaultValue(0)]
-    public int GenderFilter { get; set; } = 0;
+    public int CategoryFilter { get; set; } = 0;
 
 
     /// <summary>Initial index to start pagination</summary>

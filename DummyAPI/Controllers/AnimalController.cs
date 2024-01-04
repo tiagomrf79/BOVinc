@@ -207,14 +207,17 @@ public class AnimalController : ControllerBase
 
         if (!string.IsNullOrEmpty(searchQuery.SearchKeyword))
             query = query.Where(h => 
-                h.Name.IndexOf(searchQuery.SearchKeyword, StringComparison.OrdinalIgnoreCase) != -1
-                || h.RegistrationId.IndexOf(searchQuery.SearchKeyword, StringComparison.OrdinalIgnoreCase) != -1);
+                h.Name != null && h.Name.Contains(searchQuery.SearchKeyword, StringComparison.OrdinalIgnoreCase)
+                || h.RegistrationId != null && h.RegistrationId.Contains(searchQuery.SearchKeyword, StringComparison.OrdinalIgnoreCase));
 
         if (searchQuery.GenderFilter > 0)
             query = query.Where(a => a.GenderId == searchQuery.GenderFilter);
 
         if (searchQuery.BreedFilter > 0)
             query = query.Where(a => a.BreedId == searchQuery.BreedFilter);
+
+        if (searchQuery.CategoryFilter > 0)
+            query = query.Where(a => a.CategoryId == searchQuery.CategoryFilter);
 
         int totalCount = query.Count();
 
