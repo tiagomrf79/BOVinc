@@ -20,11 +20,6 @@ public class AnimalQueryDto<T> : IValidatableObject
     [DefaultValue(0)]
     public int BreedFilter { get; set; } = 0;
 
-    /// <summary>Filter for animal category</summary>
-    [Required]
-    [DefaultValue(0)]
-    public int CategoryFilter { get; set; } = 0;
-
 
     /// <summary>Initial index to start pagination</summary>
     [Required]
@@ -42,7 +37,7 @@ public class AnimalQueryDto<T> : IValidatableObject
     /// <summary>Sort attribute</summary>
     [Required]
     [DefaultValue("Name")]
-    public string SortAttribute { get; set; } = "Name";
+    public string SortAttribute { get; set; } = "RegistrationId";
 
     /// <summary>Sort order</summary>
     [Required]

@@ -13,9 +13,6 @@
         <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.BreedFilter">
             <summary>Filter for breed</summary>
         </member>
-        <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.CategoryFilter">
-            <summary>Filter for animal category</summary>
-        </member>
         <member name="P:DummyAPI.DTOs.AnimalQueryDto`1.StartIndex">
             <summary>Initial index to start pagination</summary>
         </member>

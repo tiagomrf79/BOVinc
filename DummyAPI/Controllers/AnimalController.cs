@@ -192,14 +192,14 @@ public class AnimalController : ControllerBase
             {
                 Id = 13,
                 RegistrationId = "PT 119 264935",
-                Name = "",
+                Name = "Malhão",
                 DateOfBirth = new DateOnly(2021,8,5),
-                GenderId = 1,
-                Gender = "Female",
+                GenderId = 2,
+                Gender = "Male",
                 BreedId = 1,
                 Breed = "Holstein-Frisia",
-                CategoryId = 2,
-                Category = "Heifers"
+                CategoryId = 5,
+                Category = "Bulls"
             },
         };
 
@@ -215,9 +215,6 @@ public class AnimalController : ControllerBase
 
         if (searchQuery.BreedFilter > 0)
             query = query.Where(a => a.BreedId == searchQuery.BreedFilter);
-
-        if (searchQuery.CategoryFilter > 0)
-            query = query.Where(a => a.CategoryId == searchQuery.CategoryFilter);
 
         int totalCount = query.Count();
 
