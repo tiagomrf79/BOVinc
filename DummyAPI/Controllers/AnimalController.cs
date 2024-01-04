@@ -319,7 +319,7 @@ public class AnimalController : ControllerBase
                 RegistrationId = "PT 394 975382",
                 DateOfBirth = new DateOnly(2022,8,8),
                 BreedingStatusId = 1,
-                BreedingStatus = null,
+                BreedingStatus = "Open",
                 LastBreedingDate = null,
                 DueDateForCalving = null
             },
@@ -329,6 +329,7 @@ public class AnimalController : ControllerBase
                 RegistrationId = "PT 476 545412",
                 DateOfBirth = new DateOnly(2021,12,31),
                 BreedingStatusId = 3,
+                BreedingStatus = "Confirmed",
                 LastBreedingDate = new DateOnly(2023,6,19),
                 DueDateForCalving = new DateOnly(2024,3,8)
             }
