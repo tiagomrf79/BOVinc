@@ -22,6 +22,7 @@ public class AnimalDto
     public string? BreedingStatus { get; set; }
     public DateOnly? LastBreedingDate { get; set; }
     public int? BreedingBullId { get; set; }
+    public string? BreedingBullName {get; set; }
     public DateOnly? LastDryDate { get; set; }
     public DateOnly? DueDateForCalving { get; set; }
 }
