@@ -68,7 +68,7 @@ public class HerdChangesController : ControllerBase
             new OptionForDropdownDto { Id = 2, Name = "Dry Cows" },
             new OptionForDropdownDto { Id = 3, Name = "Older Heifers" },
             new OptionForDropdownDto { Id = 4, Name = "Younger Heifers" },
-            new OptionForDropdownDto { Id = 4, Name = "Calves" }
+            new OptionForDropdownDto { Id = 5, Name = "Calves" }
         };
 
         return Ok(listToReturn);

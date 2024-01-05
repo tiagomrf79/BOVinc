@@ -80,11 +80,11 @@ public class EventsController : ControllerBase
                 Date = new DateOnly(2022,5,22),
                 EventTypeId = 15,
                 EventType = "Changed Group",
-                PreviousGroupId = 1,
-                PreviousGroup = "High producing cows",
-                NewGroupId = 2,
-                NewGroup = "Low producing cows",
-                EventDescription = "Move from high producing cows group to low producing cows group."
+                PreviousGroupId = 4,
+                PreviousGroup = "Younger Heifers",
+                NewGroupId = 3,
+                NewGroup = "Older Heifers",
+                EventDescription = "Move from younger heifers group to older heifers group."
             },
             new EventDto()
             {
