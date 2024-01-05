@@ -67,8 +67,9 @@ public class EventsController : ControllerBase
                 Date = new DateOnly(2022,6,17),
                 EventTypeId = 5,
                 EventType = "Breeding",
-                BreedingBullId = 459,
+                IsBreedingBullKnown = true,
                 IsCatalogSire = true,
+                BreedingBullId = 459,
                 BreedingBull = "Tsubasa",
                 EventDescription = "Artificial Insemination with bull Tsubasa.",
                 Notes = "Insemination was done by farm technician."

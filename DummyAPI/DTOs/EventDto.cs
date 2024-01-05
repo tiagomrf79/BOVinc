@@ -10,8 +10,9 @@ public class EventDto
     public string? ReasonForEntering { get; set; }
     public int? ReasonForLeavingId { get; set; }
     public string? ReasonForLeaving { get; set; }
+    public bool? IsBreedingBullKnown { get; set; }
+    public bool? IsCatalogSire { get; set; }
     public int? BreedingBullId { get; set; }
-    public bool? IsCatalogSire {  get; set; }
     public string? BreedingBull { get; set; }
     public int? PreviousGroupId { get; set; }
     public string? PreviousGroup {  get; set; }
