@@ -36,71 +36,61 @@ public class InventoryController : ControllerBase
             new ParentOptionForDropdownDto
             {
                 Id = 1,
-                RegistrationId = "PT 219 144848",
-                Name = "Marquesa",
+                Label = "Marquesa - PT 219 144848",
                 Source = "In farm"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 2,
-                RegistrationId = "PT 266 483932",
-                Name = "",
+                Label = "PT 266 483932",
                 Source = "In farm"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 3,
-                RegistrationId = "PT 829 999162",
-                Name = "Calçada",
+                Label = "Calçada - PT 829 999162",
                 Source = "In farm"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 4,
-                RegistrationId = "PT 337 386951",
-                Name = "Tieta",
+                Label = "Tieta - PT 337 386951",
                 Source = "In farm"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 5,
-                RegistrationId = "PT 454 199443",
-                Name = "Xepa",
+                Label = "Xepa - PT 454 199443",
                 Source = "In farm"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 6,
-                RegistrationId = "PT 536 445260",
-                Name = "Malhinha",
+                Label = "Malhinha - PT 536 445260",
                 Source = "In farm"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 7,
-                RegistrationId = "PT 437 619249",
-                Name = "Mimosa",
+                Label = "Mimosa - PT 437 619249",
                 Source = "In farm"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 8,
-                RegistrationId = "PT 404 653293",
-                Name = "Francisca",
+                Label = "Francisca - PT 404 653293",
                 Source = "In farm"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 59,
-                RegistrationId = "",
-                Name = "Xepa",
+                Label = "Xepa",
                 Source = "Historic records"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 97,
-                RegistrationId = "",
-                Name = "Mimosa",
+                Label = "Mimosa",
                 Source = "Historic records"
             },
         };
@@ -123,29 +113,25 @@ public class InventoryController : ControllerBase
             new ParentOptionForDropdownDto
             {
                 Id = 13,
-                RegistrationId = "PT 119 264935",
-                Name = "Malhão",
+                Label = "Malhão - PT 119 264935",
                 Source = "In farm"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 75,
-                RegistrationId = "PT 266 874625",
-                Name = "Cafuné",
+                Label = "Cafuné - PT 266 874625",
                 Source = "Historic records"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 459,
-                RegistrationId = "CANM49887946546",
-                Name = "Tsubasa",
+                Label = "Tsubasa - CANM49887946546",
                 Source = "AI bull"
             },
             new ParentOptionForDropdownDto
             {
                 Id = 497,
-                RegistrationId = "CANM46798794664",
-                Name = "Gecko",
+                Label = "Gecko - CANM46798794664",
                 Source = "AI bull"
             },
         };

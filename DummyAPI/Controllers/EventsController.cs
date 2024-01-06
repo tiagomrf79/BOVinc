@@ -70,7 +70,7 @@ public class EventsController : ControllerBase
                 IsBreedingBullKnown = true,
                 IsCatalogSire = true,
                 BreedingBullId = 459,
-                BreedingBull = "Tsubasa",
+                BreedingBull = "Tsubasa - CANM49887946546",
                 EventDescription = "Artificial Insemination with bull Tsubasa.",
                 Notes = "Insemination was done by farm technician."
             },
