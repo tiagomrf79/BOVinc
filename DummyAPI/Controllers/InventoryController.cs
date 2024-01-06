@@ -150,7 +150,8 @@ public class InventoryController : ControllerBase
             new OptionForDropdownDto { Id = 1, Name = "Milk" },
             new OptionForDropdownDto { Id = 2, Name = "Meat" },
             new OptionForDropdownDto { Id = 3, Name = "To cull" },
-            new OptionForDropdownDto { Id = 4, Name = "To sell" }
+            new OptionForDropdownDto { Id = 4, Name = "To sell" },
+            new OptionForDropdownDto { Id = 4, Name = "Breeding" }
         };
 
         return Ok(listToReturn);
