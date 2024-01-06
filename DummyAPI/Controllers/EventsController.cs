@@ -95,7 +95,7 @@ public class EventsController : ControllerBase
                 ReasonForEnteringId = 3,
                 ReasonForEntering = "Bought",
                 EventDescription = "Bought",
-                Notes = "Cost the eyes of the face."
+                Notes = "Cost me the eyes of the face."
             }
         };
 

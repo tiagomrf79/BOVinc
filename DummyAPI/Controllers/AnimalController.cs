@@ -583,4 +583,70 @@ public class AnimalController : ControllerBase
     }
 
 
+    [HttpGet("AnimalDetail", Name = "GetAnimalDetails")]
+    [SwaggerOperation(Summary = "Gets the details (name, breed, etc) of a given animal")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns the details of an animal", typeof(AnimalDetailDto))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Returns a standard error response", typeof(ProblemDetails))]
+    public async Task<ActionResult<AnimalDetailDto>> GetById(
+        [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId)
+    {
+        List<AnimalDetailDto> existingAnimals = new()
+        {
+            new AnimalDetailDto()
+            {
+                Id = 1,
+                RegistrationId = "PT 219 144848",
+                Name = "Marquesa",
+                DateOfBirth = new DateOnly(2016, 8, 28),
+                GenderId = 1,
+                Gender = "Female",
+                BreedId = 1,
+                Breed = "Holstein-Frisia",
+                DamId = 59,
+                DamLabel = "Xepa",
+                SireId = 75,
+                SireLabel = "Cafuné - PT 266 874625",
+                InventorySourceId = 1,
+                InventorySource = "Initial inventory",
+                PurposeId = 1,
+                Purpose = "Milk",
+                Notes ="Best cow ever"
+            },
+            new AnimalDetailDto()
+            {
+                Id = 59,
+                Name = "Xepa",
+                GenderId = 1,
+                Gender = "Female",
+                BreedId = 1,
+                Breed = "Holstein-Frisia",
+                InventorySourceId = 2,
+                InventorySource = "Historic record",
+                LastLactationNumber = 8
+            },
+            new AnimalDetailDto()
+            {
+                Id = 13,
+                RegistrationId = "PT 119 264935",
+                Name = "Malhão",
+                DateOfBirth = new DateOnly(2021,8,5),
+                GenderId = 2,
+                Gender = "Male",
+                BreedId = 1,
+                Breed = "Holstein-Frisia",
+                InventorySourceId = 3,
+                InventorySource = "Calving"
+            }
+
+        };
+
+        var dtoToReturn = existingAnimals.FirstOrDefault(a => a.Id == animalId);
+
+        if (dtoToReturn is null)
+            return BadRequest();
+
+        return dtoToReturn;
+    }
+
+
 }
