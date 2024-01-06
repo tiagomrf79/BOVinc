@@ -595,6 +595,7 @@ public class AnimalController : ControllerBase
             new AnimalDetailDto()
             {
                 Id = 1,
+                IsActive = true,
                 RegistrationId = "PT 219 144848",
                 Name = "Marquesa",
                 DateOfBirth = new DateOnly(2016, 8, 28),
@@ -615,6 +616,7 @@ public class AnimalController : ControllerBase
             new AnimalDetailDto()
             {
                 Id = 59,
+                IsActive = false,
                 Name = "Xepa",
                 GenderId = 1,
                 Gender = "Female",
@@ -627,6 +629,7 @@ public class AnimalController : ControllerBase
             new AnimalDetailDto()
             {
                 Id = 13,
+                IsActive = true,
                 RegistrationId = "PT 119 264935",
                 Name = "Malhão",
                 DateOfBirth = new DateOnly(2021,8,5),
