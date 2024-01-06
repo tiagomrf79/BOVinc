@@ -138,4 +138,39 @@ public class InventoryController : ControllerBase
 
         return Ok(listToReturn);
     }
+
+
+    [HttpGet("PurposeDropdown", Name = "GetPurposesForDropdown")]
+    [SwaggerOperation(Summary = "Gets purpose options for a dropdown")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of purpose options", typeof(IEnumerable<OptionForDropdownDto>))]
+    public async Task<ActionResult<IEnumerable<OptionForDropdownDto>>> GetPurposeOptions()
+    {
+        var listToReturn = new List<OptionForDropdownDto>()
+        {
+            new OptionForDropdownDto { Id = 1, Name = "Milk" },
+            new OptionForDropdownDto { Id = 2, Name = "Meat" },
+            new OptionForDropdownDto { Id = 3, Name = "To cull" },
+            new OptionForDropdownDto { Id = 4, Name = "To sell" }
+        };
+
+        return Ok(listToReturn);
+    }
+
+
+    [HttpGet("InventorySourceDropdown", Name = "GetInventorySourceForDropdown")]
+    [SwaggerOperation(Summary = "Gets inventory source options for a dropdown")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of inventory source options", typeof(IEnumerable<OptionForDropdownDto>))]
+    public async Task<ActionResult<IEnumerable<OptionForDropdownDto>>> GetInventorySourceOptions()
+    {
+        var listToReturn = new List<OptionForDropdownDto>()
+        {
+            new OptionForDropdownDto { Id = 1, Name = "Initial inventory" },
+            new OptionForDropdownDto { Id = 2, Name = "Historic record" },
+            new OptionForDropdownDto { Id = 3, Name = "Calving" },
+            new OptionForDropdownDto { Id = 4, Name = "From outside" }
+        };
+
+        return Ok(listToReturn);
+    }
+
 }
