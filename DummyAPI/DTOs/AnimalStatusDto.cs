@@ -25,7 +25,5 @@ public class AnimalStatusDto
     public DateOnly? LastHeatDate { get; set; }
     public DateOnly? ExpectedHeatDate { get; set; }
     public DateOnly? LastBreedingDate { get; set; }
-    public DateOnly? ScheduledConfirmationDate { get; set; }
-    public DateOnly? ConfirmedDate { get; set; }
     public DateOnly? DueDate { get; set; }
 }

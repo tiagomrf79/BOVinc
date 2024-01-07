@@ -47,7 +47,6 @@ public class AnimalStatusController : ControllerBase
                 BreedingStatusId = 3,
                 BreedingStatus = "Confirmed",
                 LastBreedingDate = new DateOnly(2023,2,21),
-                ConfirmedDate = new DateOnly(2023,6,21),
                 DueDate = new DateOnly(2024,1,11)
             };
         }
@@ -65,7 +64,9 @@ public class AnimalStatusController : ControllerBase
             {
                 Active = true,
                 DateOfBirth = new DateOnly(2021, 8, 5),
-                CurrentGroupName = "Main barn"
+                CurrentGroupName = "Late heifers",
+                BreedingStatusId= 1,
+                BreedingStatus = "Open",
             };
         }
         else if (animalId == 9)
@@ -78,7 +79,6 @@ public class AnimalStatusController : ControllerBase
                 BreedingStatusId = 2,
                 BreedingStatus = "Bred",
                 LastBreedingDate = new DateOnly(2023, 11, 10),
-                ScheduledConfirmationDate = new DateOnly(2024,3,10)
             };
         }
         else return BadRequest();
