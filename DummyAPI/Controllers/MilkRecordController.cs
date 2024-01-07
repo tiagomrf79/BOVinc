@@ -246,7 +246,7 @@ public class MilkRecordController : ControllerBase
         {
             CalvingDate = new DateOnly(2022, 11, 26),
             ActualMilkRecords = actualMilkRecords,
-            PredictedMilkRecords = predictedMilkRecords
+            AdjustedMilkRecords = predictedMilkRecords
         };
 
         return Ok(dtoToReturn);
