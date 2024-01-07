@@ -612,8 +612,7 @@ public class AnimalController : ControllerBase
                 PurposeId = 1,
                 Purpose = "Milk",
                 Notes ="Best cow ever",
-                CategoryId = 3,
-                Category = "Milking Cows"
+                CategorySingular = "Milking Cow"
             },
             new AnimalDetailDto()
             {
@@ -641,8 +640,7 @@ public class AnimalController : ControllerBase
                 Breed = "Holstein-Frisia",
                 InventorySourceId = 3,
                 InventorySource = "Calving",
-                CategoryId = 5,
-                Category = "Bulls"
+                CategorySingular = "Bull"
             }
 
         };

@@ -3,7 +3,7 @@
 public class AnimalDetailDto
 {
     public int Id { get; set; }
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
     public string? RegistrationId { get; set; }
     public string? Name { get; set; }
     public int BreedId { get; set; }
@@ -21,7 +21,7 @@ public class AnimalDetailDto
     public int? PurposeId { get; set; }
     public string? Purpose { get; set; }
     public string? Notes { get; set; }
-    public string? LastLeftHerdReason { get; set; }
-    public int? CategoryId { get; set; }
-    public string? Category {  get; set; }
+    public int? LeftHerdReasonId { get; set; }
+    public string? LeftHerdReason { get; set; }
+    public string? CategorySingular {  get; set; }
 }
