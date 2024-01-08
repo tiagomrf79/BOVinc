@@ -1,11 +1,21 @@
 ﻿namespace DummyAPI.DTOs;
 
-public class EventDto
+public class EventReminderDto
 {
-    public int Id {  get; set; }
+    //reminder and event
+    public bool IsReminder { get; set; } = false;
     public DateOnly Date { get; set; }
-    public int EventTypeId { get; set; }
-    public string EventType { get; set; } = string.Empty;
+
+
+    //reminder only
+    public int? ReminderTypeId { get; set; } //1-heat,2-dry,3-calving,4-confirmation,...
+    public string? ReminderType { get; set; }
+
+    
+    //event only
+    public int? Id {  get; set; }
+    public int? EventTypeId { get; set; }
+    public string? EventType { get; set; } = string.Empty;
     public int? ReasonForEnteringId { get; set; }
     public string? ReasonForEntering { get; set; }
     public int? ReasonForLeavingId { get; set; }

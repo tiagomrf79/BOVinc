@@ -54,14 +54,28 @@ public class EventsController : ControllerBase
 
 
     [HttpGet("EventsForAnimal", Name = "GetEventsForAnimal")]
-    [SwaggerOperation(Summary = "Retrieves a list of events for a given animal.")]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of events", typeof(IEnumerable<EventDto>))]
-    public async Task<ActionResult<IEnumerable<EventDto>>> GetEventsForAnimal(
+    [SwaggerOperation(Summary = "Retrieves a list of events and reminders for a given animal.")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of events and reminders", typeof(IEnumerable<EventReminderDto>))]
+    public async Task<ActionResult<IEnumerable<EventReminderDto>>> GetEventsForAnimal(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId)
     {
-        List<EventDto> listToReturn = new()
+        List<EventReminderDto> listToReturn = new()
         {
-            new EventDto()
+            new EventReminderDto()
+            {
+                IsReminder = true,
+                ReminderTypeId = 1,
+                ReminderType = "Likely Heat",
+                Date = new DateOnly(2023,7,29)
+            },
+            new EventReminderDto()
+            {
+                IsReminder = true,
+                ReminderTypeId = 1,
+                ReminderType = "Likely Heat",
+                Date = new DateOnly(2023,7,8)
+            },
+            new EventReminderDto()
             {
                 Id = 1,
                 Date = new DateOnly(2022,6,17),
@@ -74,7 +88,7 @@ public class EventsController : ControllerBase
                 EventDescription = "Artificial Insemination with bull Tsubasa.",
                 Notes = "Insemination was done by farm technician."
             },
-            new EventDto()
+            new EventReminderDto()
             {
                 Id = 2,
                 Date = new DateOnly(2022,5,22),
@@ -86,7 +100,7 @@ public class EventsController : ControllerBase
                 NewGroup = "Older Heifers",
                 EventDescription = "Move from younger heifers group to older heifers group."
             },
-            new EventDto()
+            new EventReminderDto()
             {
                 Id = 3,
                 Date = new DateOnly(2022,1,1),
