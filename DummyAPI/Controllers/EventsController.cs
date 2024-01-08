@@ -65,14 +65,14 @@ public class EventsController : ControllerBase
             {
                 IsReminder = true,
                 ReminderTypeId = 1,
-                ReminderType = "Likely Heat",
+                ReminderType = "Possible Heat",
                 Date = new DateOnly(2023,7,29)
             },
             new EventReminderDto()
             {
                 IsReminder = true,
                 ReminderTypeId = 1,
-                ReminderType = "Likely Heat",
+                ReminderType = "Possible Heat",
                 Date = new DateOnly(2023,7,8)
             },
             new EventReminderDto()
