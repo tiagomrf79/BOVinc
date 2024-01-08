@@ -63,36 +63,51 @@ public class GenealogyController : ControllerBase
         AscendantDto dtoToReturn = new()
         {
             Id = animalId,
-            AscendantLabel = name,
-            FeatureScore = "12.459 lt",
-            Dam = new AscendantDto()
+            AnimalLabel = name,
+            AnimalScore = "12.459 lt",
+            Parents = new List<ParentDto>()
             {
-                Id = 87,
-                AscendantLabel = "Malhada",
-                FeatureScore = "",
-                Dam = new AscendantDto()
+                new ParentDto()
                 {
-                    Id = 66,
-                    AscendantLabel = "PT 555 111 222",
-                    FeatureScore = "9.864 lt"
+                    Id = 87,
+                    GenderId = 1,
+                    ParentLabel = "Malhada",
+                    ParentScore = "",
+                    GrandParents = new List<GrandParentDto>()
+                    {
+                        new GrandParentDto()
+                        {
+                            Id = 66,
+                            GenderId = 1,
+                            GrandParentLabel = "PT 555 111 222",
+                            GrandParentScore = "9.864 lt"
+                        },
+                        new GrandParentDto()
+                        {
+                            Id = 156,
+                            GenderId = 2,
+                            GrandParentLabel = "PT 654 123321"
+                        }
+                    }
                 },
-                Sire = new AscendantDto()
+                new ParentDto()
                 {
                     Id = 156,
-                    AscendantLabel = "PT 654 123321"
-                }
-            },
-            Sire = new AscendantDto()
-            {
-                Id = 156,
-                AscendantLabel = "Tsubasa",
-                FeatureScore = "+1600 TPI",
-                Sire = new AscendantDto()
-                {
-                    Id = 88,
-                    AscendantLabel = "Rambo"
+                    GenderId = 2,
+                    ParentLabel = "Tsubasa",
+                    ParentScore = "+1600 TPI",
+                    GrandParents = new List<GrandParentDto>()
+                    {
+                        new GrandParentDto()
+                        {
+                            Id = 88,
+                            GenderId = 2,
+                            GrandParentLabel = "Rambo"
+                        }
+                    }
                 }
             }
+
         };
 
         return Ok(dtoToReturn);
