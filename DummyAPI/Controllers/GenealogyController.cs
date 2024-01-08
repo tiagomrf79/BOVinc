@@ -54,8 +54,8 @@ public class GenealogyController : ControllerBase
 
     [HttpGet("Ascendants", Name = "GetAscendants")]
     [SwaggerOperation(Summary = "Retrieves the ascendants of a given animal")]
-    [SwaggerResponse(StatusCodes.Status200OK, "Returns some basic information about the ascendants", typeof(IEnumerable<AscendantDto>))]
-    public async Task<ActionResult<IEnumerable<AscendantDto>>> GetAscendants(
+    [SwaggerResponse(StatusCodes.Status200OK, "Returns some basic information about the ascendants", typeof(AscendantDto))]
+    public async Task<ActionResult<AscendantDto>> GetAscendants(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId)
     {
         string name = "Marquesa";
