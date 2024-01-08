@@ -22,7 +22,7 @@ public class GenealogyController : ControllerBase
                 ParentsCross = "Marquesa x Malhão",
                 Id = 18,
                 GenderId = 1,
-                RegistrationId = "PT 254 894658",
+                AnimalName = "PT 254 894658",
                 IsActive = true
             },
             new DescendantDto()
@@ -30,6 +30,7 @@ public class GenealogyController : ControllerBase
                 ParentsCross = "PT 393 224973 x PT 879 254145",
                 Id = 19,
                 GenderId = 2,
+                AnimalName = "",
                 IsActive = false
             },
             new DescendantDto()
@@ -37,8 +38,7 @@ public class GenealogyController : ControllerBase
                 ParentsCross = "Marquesa x ?",
                 Id = 20,
                 GenderId = 1,
-                RegistrationId = "PT 666 987412",
-                Name = "Airosa",
+                AnimalName = "Airosa (PT 666 987412)",
                 IsActive = true
             },
         };
