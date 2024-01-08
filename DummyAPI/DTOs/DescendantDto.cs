@@ -2,9 +2,10 @@
 
 public class DescendantDto
 {
-    public string ParentsCross { get; set; } = string.Empty;
-    public int Id { get; set; }
+    public string DamLabel { get; set; } = string.Empty;
+    public string SireLabel {  get; set; } = string.Empty;
+    public int? Id { get; set; }
     public int GenderId { get; set; }
-    public string AnimalName { get; set; } = string.Empty;
+    public string DescendantLabel { get; set; } = string.Empty;
     public bool IsActive { get; set; }
 }

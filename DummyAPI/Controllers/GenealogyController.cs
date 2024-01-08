@@ -15,30 +15,35 @@ public class GenealogyController : ControllerBase
     public async Task<ActionResult<IEnumerable<DescendantDto>>> GetDescendants(
         [FromQuery, SwaggerParameter("Animal ID", Required = true)] int animalId)
     {
+        string DamLabel = "Marquesa";
+
         List<DescendantDto> listToReturn = new()
         {
             new DescendantDto()
             {
-                ParentsCross = "Marquesa x Malhão",
+                DamLabel = DamLabel,
+                SireLabel = "Malhão",
                 Id = 18,
                 GenderId = 1,
-                AnimalName = "PT 254 894658",
+                DescendantLabel = "PT 254 894658",
                 IsActive = true
             },
             new DescendantDto()
             {
-                ParentsCross = "PT 393 224973 x PT 879 254145",
+                DamLabel = DamLabel,
+                SireLabel = "PT 879 254145",
                 Id = 19,
                 GenderId = 2,
-                AnimalName = "",
+                DescendantLabel = "",
                 IsActive = false
             },
             new DescendantDto()
             {
-                ParentsCross = "Marquesa x ?",
+                DamLabel = DamLabel,
+                SireLabel = "",
                 Id = 20,
                 GenderId = 1,
-                AnimalName = "Airosa (PT 666 987412)",
+                DescendantLabel = "Airosa",
                 IsActive = true
             },
         };
