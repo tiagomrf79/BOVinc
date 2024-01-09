@@ -3,6 +3,7 @@
 public class AscendantDto
 {
     public string AnimalLabel { get; set; } = string.Empty;
+    public int GenderId { get; set; }
     public IEnumerable<ParentDto> Parents { get; set; } = Enumerable.Empty<ParentDto>();
 }
 
