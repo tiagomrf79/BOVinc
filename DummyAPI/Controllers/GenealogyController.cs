@@ -62,9 +62,7 @@ public class GenealogyController : ControllerBase
 
         AscendantDto dtoToReturn = new()
         {
-            Id = animalId,
             AnimalLabel = name,
-            AnimalScore = "12.459 lt",
             Parents = new List<ParentDto>()
             {
                 new ParentDto()

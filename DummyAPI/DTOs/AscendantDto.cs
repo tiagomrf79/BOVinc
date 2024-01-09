@@ -2,9 +2,7 @@
 
 public class AscendantDto
 {
-    public int Id { get; set; }
     public string AnimalLabel { get; set; } = string.Empty;
-    public string? AnimalScore { get; set; }
     public IEnumerable<ParentDto> Parents { get; set; } = Enumerable.Empty<ParentDto>();
 }
 
