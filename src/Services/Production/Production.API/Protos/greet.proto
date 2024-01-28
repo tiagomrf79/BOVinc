@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcProduction";
+
+package ProductionApi;
+
+service ProductionGrpc {
+	rpc CreateMilkMeasurement(CreateMilkMeasurementRequest) returns (MilkMeasurementResponse) {}
+	rpc UpdateMilkMeasurement(UpdateMilkMeasurementRequest) returns (MilkMeasurementResponse) {}
+	rpc DeleteMilkMeasurement(DeleteMilkMeasurementRequest) returns (DeleteMilkMeasurementResponse) {}
+}
+
+message CreateMilkMeasurementRequest {
+	int32 animalId = 1;
+	DateOnly date = 2;
+	double milkYield = 3;
+	double fatPercentage = 4;
+	double proteinPercentage = 5;
+	int32 somaticCellCount = 6;
+}
+
+message UpdateMilkMeasurementRequest {
+	int32 id = 1;
+	int32 animalId = 2;
+	DateOnly date = 3;
+	double milkYield = 4;
+	double fatPercentage = 5;
+	double proteinPercentage = 6;
+	int32 somaticCellCount = 7;
+}
+
+message DeleteMilkMeasurementRequest {
+	int32 id = 1;
+}
+
+message MilkMeasurementResponse {
+	int32 id = 1;
+	int32 animalId = 2;
+	DateOnly date = 3;
+	double milkYield = 4;
+	double fatPercentage = 5;
+	double proteinPercentage = 6;
+	int32 somaticCellCount = 7;
+}
+
+message DeleteMilkMeasurementResponse {
+	bool isDeleted = 1;
+}
+
+//get all measurements and calving date for a given animal and lactation
+//update one measurement
+//delete one measurement
+//insert one measurement
+//get all measurements and all predictions and calving date for a given animal and lactation
+//get measurement totals and prediction totals for a given animal and lactation

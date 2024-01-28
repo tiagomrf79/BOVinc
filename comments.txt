@@ -1,0 +1,29 @@
+"Each microservice should implement exactly one business capability.
+A business capability is something an organization does that contributes to business goals.
+A given business will have a number of business capabilities that together make the overall business function.
+Business capabilities are about what the business needs to get done.
+Within one bounded context, the business may need to get several things done.
+Each of these things is likely a business capability."
+
+	- Search for animal in the herd
+	- Add events to an animal or a group of animals
+	- Be notified of actions to take (reminders)
+	- View an animal history (events)
+	- View a female's current reproductive status
+	- View a AI bull profile
+	- View a cow's production in the past and present
+	- 
+
+
+	* Maintain an animal inventory
+	* 
+
+
+	=> Animal
+	=> AI bull (YES, depends on none)
+	=> Production
+	=> Events: start with events microservice, if needed expand to these 3:
+		=> Movement history
+		=> Medical history
+		=> Reproductive history
+	=> (Group action)
