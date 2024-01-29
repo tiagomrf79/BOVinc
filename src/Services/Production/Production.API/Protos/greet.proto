@@ -8,6 +8,10 @@ service ProductionGrpc {
 	rpc CreateMilkMeasurement(CreateMilkMeasurementRequest) returns (MilkMeasurementResponse) {}
 	rpc UpdateMilkMeasurement(UpdateMilkMeasurementRequest) returns (MilkMeasurementResponse) {}
 	rpc DeleteMilkMeasurement(DeleteMilkMeasurementRequest) returns (DeleteMilkMeasurementResponse) {}
+
+	rpc GetLactationMilkMeasurements(MilkMeasurementsForTableResponse) returns () {}
+	rpc GetLactationMilkMeasurementsAndPredictions() returns () {}
+	rpc GetlactationMilkMeasurementsAndPredictionsTotals() returns () {}
 }
 
 message CreateMilkMeasurementRequest {
@@ -45,6 +49,11 @@ message MilkMeasurementResponse {
 
 message DeleteMilkMeasurementResponse {
 	bool isDeleted = 1;
+}
+
+message MilkMeasurementsForTableResponse {
+	DateOnly calvingDate = 1;
+	repeated MilkMeasurementResponse MilkMeasurements = 2;
 }
 
 //get all measurements and calving date for a given animal and lactation
