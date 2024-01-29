@@ -2,16 +2,18 @@ syntax = "proto3";
 
 option csharp_namespace = "GrpcProduction";
 
-package ProductionApi;
+//package ProductionApi;
+
+import "google/protobuf/date";
 
 service ProductionGrpc {
-	rpc CreateMilkMeasurement(CreateMilkMeasurementRequest) returns (MilkMeasurementResponse) {}
+	rpc CreateMilkMeasurement(CreateMilkMeasurementRequest) returns (MilkMeasurementResponse);
 	rpc UpdateMilkMeasurement(UpdateMilkMeasurementRequest) returns (MilkMeasurementResponse) {}
 	rpc DeleteMilkMeasurement(DeleteMilkMeasurementRequest) returns (DeleteMilkMeasurementResponse) {}
 
-	rpc GetLactationMilkMeasurements(MilkMeasurementsForTableResponse) returns () {}
-	rpc GetLactationMilkMeasurementsAndPredictions() returns () {}
-	rpc GetlactationMilkMeasurementsAndPredictionsTotals() returns () {}
+	rpc GetLactationMilkMeasurements(MilkMeasurementRequest) returns (MilkMeasurementForTableResponse) {}
+	rpc GetLactationMilkMeasurementsAndPredictions(MilkMeasurementRequest) returns (MilkMeasurementForChartResponse) {}
+	rpc GetlactationMilkMeasurementsAndPredictionsTotals(MilkMeasurementRequest) returns (MilkMeasurementTotalForTableResponse) {}
 }
 
 message CreateMilkMeasurementRequest {
@@ -37,6 +39,11 @@ message DeleteMilkMeasurementRequest {
 	int32 id = 1;
 }
 
+message MilkMeasurementRequest {
+	int32 animalId = 1;
+	int32 lactationId = 2;
+}
+
 message MilkMeasurementResponse {
 	int32 id = 1;
 	int32 animalId = 2;
@@ -51,9 +58,43 @@ message DeleteMilkMeasurementResponse {
 	bool isDeleted = 1;
 }
 
-message MilkMeasurementsForTableResponse {
+message MilkMeasurementForTableResponse {
 	DateOnly calvingDate = 1;
-	repeated MilkMeasurementResponse MilkMeasurements = 2;
+	repeated MilkMeasurement MilkMeasurements = 2;
+}
+
+message MilkMeasurement {
+	int32 id = 1;
+	int32 animalId = 2;
+	DateOnly date = 3;
+	double milkYield = 4;
+	double fatPercentage = 5;
+	double proteinPercentage = 6;
+	int32 somaticCellCount = 7;
+}
+
+message MilkMeasurementForChartResponse {
+	DateOnly calvingDate = 1;
+	repeated MilkOnlyMeasurement ActualMilkRecords = 2;
+	repeated MilkOnlyMeasurement AdjustedMilkRecords = 3;
+}
+
+message MilkOnlyMeasurement {
+	int32 id = 1;
+	DateOnly date = 2;
+	double milkYield = 3;
+}
+
+message MilkMeasurementTotalForTableResponse {
+	int32 order = 1;
+	string name = 2;
+	repeated MilkTotal milkTotals = 3;
+}
+
+message MilkTotal {
+	int32 milkYield = 1;
+	int32 fatYield = 2;
+	int32 proteinYield = 3;
 }
 
 //get all measurements and calving date for a given animal and lactation
