@@ -1,10 +1,11 @@
 syntax = "proto3";
 
-option csharp_namespace = "GrpcProduction";
+//option csharp_namespace = "GrpcProduction";
 
-//package ProductionApi;
+//package GrpcProduction;
 
-import "google/protobuf/date";
+//import "google/protobuf/date";
+import "Protos/date.proto";
 
 service ProductionGrpc {
 	rpc CreateMilkMeasurement(CreateMilkMeasurementRequest) returns (MilkMeasurementResponse);
@@ -18,7 +19,7 @@ service ProductionGrpc {
 
 message CreateMilkMeasurementRequest {
 	int32 animalId = 1;
-	DateOnly date = 2;
+	google.type.Date date = 2;
 	double milkYield = 3;
 	double fatPercentage = 4;
 	double proteinPercentage = 5;
@@ -28,7 +29,7 @@ message CreateMilkMeasurementRequest {
 message UpdateMilkMeasurementRequest {
 	int32 id = 1;
 	int32 animalId = 2;
-	DateOnly date = 3;
+	google.type.Date date = 3;
 	double milkYield = 4;
 	double fatPercentage = 5;
 	double proteinPercentage = 6;
@@ -47,7 +48,7 @@ message MilkMeasurementRequest {
 message MilkMeasurementResponse {
 	int32 id = 1;
 	int32 animalId = 2;
-	DateOnly date = 3;
+	google.type.Date date = 3;
 	double milkYield = 4;
 	double fatPercentage = 5;
 	double proteinPercentage = 6;
@@ -59,14 +60,14 @@ message DeleteMilkMeasurementResponse {
 }
 
 message MilkMeasurementForTableResponse {
-	DateOnly calvingDate = 1;
+	google.type.Date calvingDate = 1;
 	repeated MilkMeasurement MilkMeasurements = 2;
 }
 
 message MilkMeasurement {
 	int32 id = 1;
 	int32 animalId = 2;
-	DateOnly date = 3;
+	google.type.Date date = 3;
 	double milkYield = 4;
 	double fatPercentage = 5;
 	double proteinPercentage = 6;
@@ -74,14 +75,14 @@ message MilkMeasurement {
 }
 
 message MilkMeasurementForChartResponse {
-	DateOnly calvingDate = 1;
+	google.type.Date calvingDate = 1;
 	repeated MilkOnlyMeasurement ActualMilkRecords = 2;
 	repeated MilkOnlyMeasurement AdjustedMilkRecords = 3;
 }
 
 message MilkOnlyMeasurement {
 	int32 id = 1;
-	DateOnly date = 2;
+	google.type.Date date = 2;
 	double milkYield = 3;
 }
 

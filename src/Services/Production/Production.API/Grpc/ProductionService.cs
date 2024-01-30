@@ -1,6 +1,6 @@
 ﻿namespace Production.API.Grpc;
 
-public class ProductionService
+public class ProductionService : ProductionGrpc.ProductionGrpcBase
 {
 
 
