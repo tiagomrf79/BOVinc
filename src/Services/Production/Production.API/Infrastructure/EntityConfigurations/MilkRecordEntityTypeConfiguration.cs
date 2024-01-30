@@ -4,16 +4,16 @@ using Production.API.Models;
 
 namespace Production.API.Infrastructure.EntityConfigurations;
 
-public class MilkMeasurementEntityTypeConfiguration : IEntityTypeConfiguration<MilkMeasurement>
+public class MilkRecordEntityTypeConfiguration : IEntityTypeConfiguration<MilkRecord>
 {
-    public void Configure(EntityTypeBuilder<MilkMeasurement> builder)
+    public void Configure(EntityTypeBuilder<MilkRecord> builder)
     {
-        builder.ToTable("MilkMeasurement");
+        builder.ToTable("MilkRecord");
 
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .UseHiLo("milk_measurement_hilo")
+            .UseHiLo("milk_record_hilo")
             .IsRequired();
 
         builder.Property(x => x.Date)

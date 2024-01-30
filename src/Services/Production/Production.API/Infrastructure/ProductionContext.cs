@@ -7,7 +7,7 @@ namespace Production.API.Infrastructure;
 public class ProductionContext : DbContext
 {
     public DbSet<Lactation> Lactations { get; set; }
-    public DbSet<MilkMeasurement> MilkMeasurement { get; set; }
+    public DbSet<MilkRecord> MilkRecords { get; set; }
 
     public ProductionContext(DbContextOptions<ProductionContext> options) : base()
     {
@@ -21,6 +21,6 @@ public class ProductionContext : DbContext
             new LactationEntityTypeConfiguration());
 
         modelBuilder.ApplyConfiguration(
-            new MilkMeasurementEntityTypeConfiguration());
+            new MilkRecordEntityTypeConfiguration());
     }
 }

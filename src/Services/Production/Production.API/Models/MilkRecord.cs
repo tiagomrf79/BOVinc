@@ -1,6 +1,6 @@
 ﻿namespace Production.API.Models;
 
-public class MilkMeasurement
+public class MilkRecord
 {
     public int Id { get; set; }
     public DateOnly Date { get; set; }
