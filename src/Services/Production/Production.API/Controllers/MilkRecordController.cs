@@ -5,6 +5,7 @@ using Production.API.DTOs;
 using Production.API.Infrastructure;
 using Production.API.Models;
 using System.ComponentModel.DataAnnotations;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Production.API.Controllers;
 
@@ -57,7 +58,7 @@ public class MilkRecordController : ControllerBase
             return BadRequest(problemDetails);
         }
 
-        Lactation? lactation = await GetAnimalLactationByDate(dataReceived.AnimalId, dataReceived.Date);
+        Lactation? lactation = await GetLactationByDate(dataReceived.AnimalId, dataReceived.Date);
 
         // Date of milk record must be between a calving date and end date
         if (lactation == null)
@@ -156,6 +157,47 @@ public class MilkRecordController : ControllerBase
             return BadRequest(problemDetails);
         }
 
+        Lactation? lactation = await GetLactationByDate(dataReceived.AnimalId, dataReceived.Date);
+
+        // Date of milk record must be between a calving date and end date
+        if (lactation == null)
+        {
+            ProblemDetails problemDetails = new()
+            {
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
+                Title = "Invalid request.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = $"Data of milk record is not valid for this animal."
+            };
+
+            return BadRequest(problemDetails);
+        }
+
+        bool alreadyExists = await _productionContext.MilkRecords
+            .Where(x =>
+                x.Id != dataReceived.Id
+                && x.AnimalId == dataReceived.AnimalId
+                && x.Date == dataReceived.Date
+                && x.MilkYield == dataReceived.MilkYield
+                && x.FatPercentage == dataReceived.FatPercentage
+                && x.ProteinPercentage == dataReceived.ProteinPercentage
+                && x.SomaticCellCount == dataReceived.SomaticCellCount
+            ).AnyAsync();
+
+        // Don't allow duplicate measurements (same animal, date, milk, fat, protein and SCC)
+        if (alreadyExists)
+        {
+            ProblemDetails problemDetails = new()
+            {
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
+                Title = "Invalid request.",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = $"A milk record with the same values already exists."
+            };
+
+            return BadRequest(problemDetails);
+        }
+
         recordToUpdate.LastUpdatedAt = DateTime.UtcNow;
         _productionContext.Update(recordToUpdate);
         await _productionContext.SaveChangesAsync();
@@ -199,38 +241,24 @@ public class MilkRecordController : ControllerBase
             "Begin call to {MethodName} for animal id {AnimalId} and lactation id {LactationId}",
             nameof(GetMilkRecordsForTable), animalId, lactationId);
 
-        Lactation? lactation = await _productionContext.Lactations.FindAsync(lactationId);
+        List<MilkRecordDto> milkRecords = new();
 
+        Lactation? lactation = await GetLactationById(lactationId);
         if (lactation == null)
         {
-            _logger.LogInformation("Lactation id {LactationId} was not found.", lactationId);
-            return Ok(new List<MilkRecordForTableDto>());
-        }
-
-        DateOnly? lactationEndDate = lactation.EndDate;
-        
-        // if there is no lactation end date, either the lactation is in progress (null) or we assume it ended at the subsequent lactation start date
-        if(lactationEndDate == null)
-        {
-            Lactation? nextLactation = await _productionContext.Lactations
-                .Where(x => 
-                    x.AnimalId == animalId
-                    && x.CalvingDate > lactation.CalvingDate)
-                .OrderBy(x => x.CalvingDate)
-                .FirstOrDefaultAsync();
-
-            if (nextLactation != null)
-                lactationEndDate = nextLactation.CalvingDate;
+            _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
+            return Ok(
+                new MilkRecordForTableDto(null, milkRecords));
         }
 
         List<MilkRecord> queryResults = await _productionContext.MilkRecords
-            .Where(x => 
-                x.AnimalId == animalId 
-                && x.Date >= lactation.CalvingDate 
-                && lactationEndDate == null || x.Date < lactationEndDate)
+            .Where(x =>
+                x.AnimalId == animalId
+                && x.Date >= lactation.CalvingDate
+                && lactation.EndDate == null || x.Date < lactation.EndDate)
             .ToListAsync();
 
-        List<MilkRecordDto> milkRecords = _mapper.Map<List<MilkRecordDto>>(queryResults);
+        milkRecords = _mapper.Map<List<MilkRecordDto>>(queryResults);
 
         MilkRecordForTableDto dtoToReturn = new(
             CalvingDate: lactation.CalvingDate,
@@ -240,7 +268,54 @@ public class MilkRecordController : ControllerBase
         return Ok(dtoToReturn);
     }
 
-    public async Task<Lactation?> GetAnimalLactationByDate(int animalId, DateOnly date)
+    [HttpGet("Chart")]
+    public async Task<ActionResult<MilkRecordForChartDto>> GetMilkRecordsForChart(
+        [FromQuery] int animalId,
+        [FromQuery] int lactationId)
+    {
+        _logger.LogInformation(
+            "Begin call to {MethodName} for animal id {AnimalId} and lactation id {LactationId}",
+            nameof(GetMilkRecordsForChart), animalId, lactationId);
+
+        List<MilkOnlyRecordDto> actualMilkRecords = new();
+        List<MilkOnlyRecordDto> adjustedMilkRecords = new();
+
+        Lactation? lactation = await GetLactationById(lactationId);
+        if (lactation == null)
+        {
+            _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
+            return Ok(
+                new MilkRecordForChartDto(null, actualMilkRecords, adjustedMilkRecords));
+        }
+
+        List<MilkRecord> queryResults = await _productionContext.MilkRecords
+            .Where(x =>
+                x.AnimalId == animalId
+                && x.Date >= lactation.CalvingDate
+                && lactation.EndDate == null || x.Date < lactation.EndDate)
+            .ToListAsync();
+
+        actualMilkRecords = _mapper.Map<List<MilkOnlyRecordDto>>(queryResults);
+
+        throw new NotImplementedException();
+
+        MilkRecordForChartDto dtoToReturn = new(
+            lactation.CalvingDate,
+            actualMilkRecords,
+            adjustedMilkRecords);
+
+        return Ok(dtoToReturn);
+    }
+
+    [HttpGet("Total")]
+    public async Task<ActionResult<MilkTotalForTableDto>> GetMilkTotalsForTable(
+        [FromQuery] int animalId,
+        [FromQuery] int lactationId)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task<Lactation?> GetLactationByDate(int animalId, DateOnly date)
     {
         var lactations = _productionContext.Lactations.Where(x => x.AnimalId == animalId);
 
@@ -254,29 +329,48 @@ public class MilkRecordController : ControllerBase
         if (currentLactation == null)
             return null;
 
-        // return lactation with end date
-        if (currentLactation.EndDate != null)
-            return currentLactation;
+        currentLactation.EndDate = await GetEndDateForLactation(currentLactation);
 
-        // get the earliest lactation that starts after the given name
-        Lactation? nextLactation = await lactations
-            .Where(x => x.CalvingDate > date)
+        return currentLactation;
+    }
+
+    private async Task<Lactation?> GetLactationById(int lactationId)
+    {
+        Lactation? currentLactation = await _productionContext.Lactations.FindAsync(lactationId);
+
+        // no match for given id
+        if (currentLactation == null)
+            return null;
+
+        currentLactation.EndDate = await GetEndDateForLactation(currentLactation);
+
+        return currentLactation;
+    }
+
+    private async Task<DateOnly?> GetEndDateForLactation(Lactation lactation)
+    {
+        if (lactation.EndDate != null)
+            return lactation.EndDate;
+
+        Lactation? nextLactation = await _productionContext.Lactations
+            .Where(x =>
+                x.AnimalId == lactation.AnimalId
+                && x.CalvingDate > lactation.CalvingDate)
             .OrderBy(x => x.CalvingDate)
             .FirstOrDefaultAsync();
 
-        // return ongoing lactation without end date
+        // ongoing lactation => no end date
         if (nextLactation == null)
-            return currentLactation;
+            return null;
 
-        // return lactation with assumed end date
-        currentLactation.EndDate = nextLactation.CalvingDate;
-        return currentLactation;
+        // closed lactation => next lactation calving date
+        return nextLactation.CalvingDate;
     }
 }
 
 //  get all measurements and calving date for a given animal and lactation: GET recordings
-//insert one measurement: POST recordings
-//update one measurement: PUT recordings/1
-//delete one measurement: DELETE recordings/1
+//  insert one measurement: POST recordings
+//  update one measurement: PUT recordings/1
+//  delete one measurement: DELETE recordings/1
 //get all measurements and all predictions and calving date for a given animal and lactation: GET recordings/adjusted
 //get measurement totals and prediction totals for a given animal and lactation: GET recordings/totals

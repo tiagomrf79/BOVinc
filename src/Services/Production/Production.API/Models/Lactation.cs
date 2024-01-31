@@ -7,7 +7,6 @@ public class Lactation
     public DateOnly? EndDate { get; set; }
     public int AnimalId { get; set; }
 
-
     //  Any milk measurements before the earliest lactation CalvingDate will be ignored
     //  Any milk measurements between current CalvingDate and previous EndDate will be ignored
     //  Any milk measurements between current EndDate and next CalvingDate will be ignored
