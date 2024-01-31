@@ -2,7 +2,7 @@
 
 public record MilkRecordDto(
     int? Id,
-    DateOnly date,
+    DateOnly Date,
     double? MilkYield,
     double? FatPercentage,
     double? ProteinPercentage,

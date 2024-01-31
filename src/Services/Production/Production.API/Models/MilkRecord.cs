@@ -1,6 +1,8 @@
-﻿namespace Production.API.Models;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class MilkRecord
+namespace Production.API.Models;
+
+public class MilkRecord : IValidatableObject
 {
     public int Id { get; set; }
     public DateOnly Date { get; set; }
@@ -9,17 +11,24 @@ public class MilkRecord
     public double? ProteinPercentage {  get; set; }
     public int? SomaticCellCount { get; set; }
     public int AnimalId { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime LastUpdatedAt { get; set;}
 
-    //Milk measurements are assigned to the given lactation at runtime
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Date > DateOnly.FromDateTime(DateTime.UtcNow))
+            yield return new ValidationResult("Date of measurement cannot be in the future.", new[] { nameof(Date) });
 
-    //don't allow duplicate measurements (same date, milk, fat, protein, SCC and AnimalId)
-    //Measurement date must be after a CalvingDate and
-    //  before an EndDate if not last lactation
-    //  or before the next CalvingDate if not last lactation and EndDate is null
-    //Measurement date must be 
-    //AnimalId must belong to a cow with at least one lactation
-    //Measurement date cannot be before the cows earliest lactation CalvingDate
-    //Measurement date cannot be after today
-    //MilkYield, FatPercentage, ProteinPercentage and SomaticCellCount must be null or greater than or equal to 0
-    //At least one of MilkYield, FatPercentage, ProteinPercentage and SomaticCellCount must not be null
+        if (MilkYield != null && MilkYield < 0)
+            yield return new ValidationResult("Milk yield cannot be negative.", new[] { nameof(MilkYield) });
+        if (FatPercentage != null & FatPercentage < 0)
+            yield return new ValidationResult("Fat percentage cannot be negative.", new[] { nameof(FatPercentage) });
+        if (ProteinPercentage != null & ProteinPercentage < 0)
+            yield return new ValidationResult("Protein percentage cannot be negative.", new[] { nameof(ProteinPercentage) });
+        if (SomaticCellCount != null & SomaticCellCount < 0)
+            yield return new ValidationResult("Somatic cell count cannot be negative.", new[] { nameof(SomaticCellCount) });
+
+        if (MilkYield == null && FatPercentage == null && ProteinPercentage == null && SomaticCellCount == null)
+            yield return new ValidationResult("At least one of milk yield, fat percentage, protein percentage and somatic cell count is required.", new[] { nameof(MilkYield) });
+    }
 }

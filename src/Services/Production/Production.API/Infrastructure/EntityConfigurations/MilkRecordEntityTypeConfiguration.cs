@@ -12,6 +12,7 @@ public class MilkRecordEntityTypeConfiguration : IEntityTypeConfiguration<MilkRe
 
         builder.HasKey(x => x.Id);
 
+        // With HiLo, EF fetches a block of values from the database to use as IDs
         builder.Property(x => x.Id)
             .UseHiLo("milk_record_hilo")
             .IsRequired();
