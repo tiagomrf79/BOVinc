@@ -1,6 +1,6 @@
 ﻿namespace Production.API.DTOs;
 
-public record MilkTotalDto(
+public record YieldsTotalDto(
     int MilkYield,
     int FatYield,
     int ProteinYield);

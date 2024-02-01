@@ -27,7 +27,7 @@ public class MilkRecordController : ControllerBase
     //Milk measurements are assigned to the given lactation at runtime
 
     [HttpPost]
-    public async Task<ActionResult> CreateMilkRecord([FromBody] MilkRecordDto dataReceived)
+    public async Task<ActionResult> CreateMilkRecord([FromBody] FullRecordDto dataReceived)
     {
         _logger.LogInformation(
             "Begin call to {MethodName} for new milk record with data {DataReceived}",
@@ -110,7 +110,7 @@ public class MilkRecordController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult> UpdateMilkRecord([FromBody] MilkRecordDto dataReceived)
+    public async Task<ActionResult> UpdateMilkRecord([FromBody] FullRecordDto dataReceived)
     {
         _logger.LogInformation(
             "Begin call to {MethodName} for updating milk record {id} with data {DataReceived}",
@@ -132,7 +132,7 @@ public class MilkRecordController : ControllerBase
             return NotFound(problemDetails);
         }
 
-        _mapper.Map(dataReceived, recordToUpdate, typeof(MilkRecordDto), typeof(MilkRecord));
+        _mapper.Map(dataReceived, recordToUpdate, typeof(FullRecordDto), typeof(MilkRecord));
 
         var validationResults = new List<ValidationResult>();
         bool isValid = Validator.TryValidateObject(
@@ -233,7 +233,7 @@ public class MilkRecordController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<MilkRecordForTableDto>> GetMilkRecordsForTable(
+    public async Task<ActionResult<MilkRecordForTableVm>> GetMilkRecordsForTable(
         [FromQuery] int animalId,
         [FromQuery] int lactationId)
     {
@@ -241,14 +241,14 @@ public class MilkRecordController : ControllerBase
             "Begin call to {MethodName} for animal id {AnimalId} and lactation id {LactationId}",
             nameof(GetMilkRecordsForTable), animalId, lactationId);
 
-        List<MilkRecordDto> milkRecords = new();
+        List<FullRecordDto> milkRecords = new();
 
         Lactation? lactation = await GetLactationById(lactationId);
         if (lactation == null)
         {
             _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
             return Ok(
-                new MilkRecordForTableDto(null, milkRecords));
+                new MilkRecordForTableVm(null, milkRecords));
         }
 
         List<MilkRecord> queryResults = await _productionContext.MilkRecords
@@ -258,9 +258,9 @@ public class MilkRecordController : ControllerBase
                 && lactation.EndDate == null || x.Date < lactation.EndDate)
             .ToListAsync();
 
-        milkRecords = _mapper.Map<List<MilkRecordDto>>(queryResults);
+        milkRecords = _mapper.Map<List<FullRecordDto>>(queryResults);
 
-        MilkRecordForTableDto dtoToReturn = new(
+        MilkRecordForTableVm dtoToReturn = new(
             CalvingDate: lactation.CalvingDate,
             MilkRecords: milkRecords);
 
@@ -269,7 +269,7 @@ public class MilkRecordController : ControllerBase
     }
 
     [HttpGet("Chart")]
-    public async Task<ActionResult<MilkRecordForChartDto>> GetMilkRecordsForChart(
+    public async Task<ActionResult<MilkRecordForChartVm>> GetMilkRecordsForChart(
         [FromQuery] int animalId,
         [FromQuery] int lactationId)
     {
@@ -277,29 +277,30 @@ public class MilkRecordController : ControllerBase
             "Begin call to {MethodName} for animal id {AnimalId} and lactation id {LactationId}",
             nameof(GetMilkRecordsForChart), animalId, lactationId);
 
-        List<MilkOnlyRecordDto> actualMilkRecords = new();
-        List<MilkOnlyRecordDto> adjustedMilkRecords = new();
+        List<YieldOnlyRecordDto> actualMilkRecords = new();
+        List<YieldOnlyRecordDto> adjustedMilkRecords = new();
 
         Lactation? lactation = await GetLactationById(lactationId);
         if (lactation == null)
         {
             _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
             return Ok(
-                new MilkRecordForChartDto(null, actualMilkRecords, adjustedMilkRecords));
+                new MilkRecordForChartVm(null, actualMilkRecords, adjustedMilkRecords));
         }
 
         List<MilkRecord> queryResults = await _productionContext.MilkRecords
             .Where(x =>
                 x.AnimalId == animalId
                 && x.Date >= lactation.CalvingDate
-                && lactation.EndDate == null || x.Date < lactation.EndDate)
+                && lactation.EndDate == null || x.Date < lactation.EndDate
+                && x.MilkYield != null)
             .ToListAsync();
 
-        actualMilkRecords = _mapper.Map<List<MilkOnlyRecordDto>>(queryResults);
+        actualMilkRecords = _mapper.Map<List<YieldOnlyRecordDto>>(queryResults);
 
         throw new NotImplementedException();
 
-        MilkRecordForChartDto dtoToReturn = new(
+        MilkRecordForChartVm dtoToReturn = new(
             lactation.CalvingDate,
             actualMilkRecords,
             adjustedMilkRecords);
@@ -308,11 +309,87 @@ public class MilkRecordController : ControllerBase
     }
 
     [HttpGet("Total")]
-    public async Task<ActionResult<MilkTotalForTableDto>> GetMilkTotalsForTable(
+    public async Task<ActionResult<IEnumerable<MilkTotalForTableVm>>> GetMilkTotalsForTable(
         [FromQuery] int animalId,
         [FromQuery] int lactationId)
     {
-        throw new NotImplementedException();
+        List<MilkTotalForTableVm> listToReturn = new();
+
+        _logger.LogInformation(
+            "Begin call to {MethodName} for animal id {AnimalId} and lactation id {LactationId}",
+            nameof(GetMilkTotalsForTable), animalId, lactationId);
+
+        Lactation? lactation = await _productionContext.Lactations.FindAsync(lactationId);
+        if (lactation == null)
+        {
+            _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
+            throw new NotImplementedException();
+        }
+
+        DateOnly calvingDate = lactation.CalvingDate;
+        DateOnly? endDate = lactation.EndDate;
+
+        var milkRecords = _productionContext.MilkRecords
+            .Where(x =>
+                x.AnimalId == animalId
+                && x.Date >= calvingDate
+                && endDate == null || x.Date < endDate
+                && x.MilkYield != null)
+            .OrderBy(x => x.Date);
+
+        var milkYields = await milkRecords
+            .Select(x => 
+                new YieldOnlyRecordDto(
+                    x.Id,
+                    x.Date,
+                    x.MilkYield ?? 0))
+            .ToListAsync();
+        var fatYields = await milkRecords
+            .Where(x => x.FatPercentage != null)
+            .Select(x =>
+                new YieldOnlyRecordDto(
+                    x.Id,
+                    x.Date,
+                    x.MilkYield * x.FatPercentage / 100 ?? 0))
+            .ToListAsync();
+        var proteinYields = await milkRecords
+            .Where(x => x.ProteinPercentage != null)
+            .Select(x =>
+                new YieldOnlyRecordDto(
+                    x.Id,
+                    x.Date,
+                    x.MilkYield * x.ProteinPercentage / 100 ?? 0))
+            .ToListAsync();
+
+        int totalMilkProduction = GetTotalProductionFromYields(milkYields, calvingDate, endDate);
+        int totalFatProduction = GetTotalProductionFromYields(fatYields, calvingDate, endDate);
+        int totalProteinProduction = GetTotalProductionFromYields(proteinYields, calvingDate, endDate);
+
+        listToReturn.Add(
+            new MilkTotalForTableVm(
+                Order: 1,
+                Name: "Actual production",
+                MilkTotals: new[] {
+                    new YieldsTotalDto(
+                        MilkYield: totalMilkProduction,
+                        FatYield: totalFatProduction,
+                        ProteinYield: totalProteinProduction)}));
+
+        int adjustedMilkProduction = GetAdjustedTotalProductionFromYields(milkYields, calvingDate, endDate);
+        int adjustedFatProduction = GetAdjustedTotalProductionFromYields(fatYields, calvingDate, endDate);
+        int adjustedProteinProduction = GetAdjustedTotalProductionFromYields(proteinYields, calvingDate, endDate);
+
+        listToReturn.Add(
+            new MilkTotalForTableVm(
+                Order: 1,
+                Name: "Adjusted to 305 days",
+                MilkTotals: new[] {
+                    new YieldsTotalDto(
+                        MilkYield: adjustedMilkProduction,
+                        FatYield: adjustedFatProduction,
+                        ProteinYield: adjustedProteinProduction)}));
+
+        return Ok(listToReturn);
     }
 
     private async Task<Lactation?> GetLactationByDate(int animalId, DateOnly date)
@@ -366,11 +443,48 @@ public class MilkRecordController : ControllerBase
         // closed lactation => next lactation calving date
         return nextLactation.CalvingDate;
     }
+
+    private int GetTotalProductionFromYields(List<YieldOnlyRecordDto> records, DateOnly startDate, DateOnly? endDate)
+    {
+        int total = 0;
+        const MidpointRounding roundingMethod = MidpointRounding.AwayFromZero;
+
+        for (int i = 0; i < records.Count; i++)
+        {
+            int daysInMilk = records[i].Date.DayNumber - startDate.DayNumber;
+
+            if (i == 0)
+                total += (int)Math.Round(daysInMilk * records[i].Yield, roundingMethod);
+            else
+                total += (int)Math.Round(daysInMilk * (records[i-1].Yield + records[i].Yield) / 2, roundingMethod);
+
+            if (endDate != null && i == records.Count - 1)
+            {
+                int remainingDays = endDate?.DayNumber - records[i].Date.DayNumber ?? 0;
+                total += (int)Math.Round(remainingDays * records[i].Yield, roundingMethod);
+            }
+        }
+
+        return total;
+    }
+
+    private int GetAdjustedTotalProductionFromYields(List<YieldOnlyRecordDto> records, DateOnly startDate, DateOnly? endDate)
+    {
+        int total = 0;
+        const MidpointRounding roundingMethod = MidpointRounding.AwayFromZero;
+
+        for (int i = 0; i < records.Count; i++)
+        {
+            total += (int)Math.Round(records[i].Yield, roundingMethod);
+        }
+
+        return total;
+    }
 }
 
 //  get all measurements and calving date for a given animal and lactation: GET recordings
 //  insert one measurement: POST recordings
 //  update one measurement: PUT recordings/1
 //  delete one measurement: DELETE recordings/1
-//get all measurements and all predictions and calving date for a given animal and lactation: GET recordings/adjusted
-//get measurement totals and prediction totals for a given animal and lactation: GET recordings/totals
+//get all measurements and all predictions and calving date for a given animal and lactation: GET recordings/chart
+//get measurement total and prediction total for a given animal and lactation: GET recordings/total

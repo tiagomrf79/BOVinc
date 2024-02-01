@@ -28,7 +28,12 @@ public class MilkRecord : IValidatableObject
         if (SomaticCellCount != null & SomaticCellCount < 0)
             yield return new ValidationResult("Somatic cell count cannot be negative.", new[] { nameof(SomaticCellCount) });
 
-        if (MilkYield == null && FatPercentage == null && ProteinPercentage == null && SomaticCellCount == null)
-            yield return new ValidationResult("At least one of milk yield, fat percentage, protein percentage and somatic cell count is required.", new[] { nameof(MilkYield) });
+        if (MilkYield == null && FatPercentage != null)
+            yield return new ValidationResult("Milk yield is required when setting the fat percentage.", new[] { nameof(MilkYield) });
+        if (MilkYield == null && ProteinPercentage != null)
+            yield return new ValidationResult("Milk yield is required when setting the protein percentage.", new[] { nameof(MilkYield) });
+
+        if (MilkYield == null && SomaticCellCount == null)
+            yield return new ValidationResult("At least milk yield or somatic cell count are required.", new[] { nameof(MilkYield) });
     }
 }

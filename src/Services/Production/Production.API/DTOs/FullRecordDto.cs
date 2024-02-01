@@ -1,6 +1,6 @@
 ﻿namespace Production.API.DTOs;
 
-public record MilkRecordDto(
+public record FullRecordDto(
     int? Id,
     DateOnly Date,
     double? MilkYield,

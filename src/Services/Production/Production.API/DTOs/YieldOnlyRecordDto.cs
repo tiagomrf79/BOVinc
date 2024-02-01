@@ -1,6 +1,6 @@
 ﻿namespace Production.API.DTOs;
 
-public record MilkOnlyRecordDto(
+public record YieldOnlyRecordDto(
     int Id,
     DateOnly Date,
-    double MilkYield);
+    double Yield);

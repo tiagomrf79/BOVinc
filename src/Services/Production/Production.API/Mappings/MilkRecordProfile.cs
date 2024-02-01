@@ -8,6 +8,6 @@ public class MilkRecordProfile : Profile
 {
     public MilkRecordProfile()
     {
-        CreateMap<MilkRecord, MilkRecordDto>().ReverseMap();
+        CreateMap<MilkRecord, FullRecordDto>().ReverseMap();
     }
 }
