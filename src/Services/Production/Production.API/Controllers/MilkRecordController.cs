@@ -5,7 +5,6 @@ using Production.API.DTOs;
 using Production.API.Infrastructure;
 using Production.API.Models;
 using System.ComponentModel.DataAnnotations;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Production.API.Controllers;
 
