@@ -1,6 +1,6 @@
 ﻿namespace Production.API.DTOs;
 
-public record YieldOnlyRecordDto(
+public record YieldOnlySampleDto(
     int Id,
     DateOnly Date,
     double Yield);

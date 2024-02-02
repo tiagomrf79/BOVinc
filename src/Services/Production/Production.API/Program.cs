@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Production.API.Infrastructure;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+builder.Services.AddDbContext<ProductionContext>(options =>
+{
+    options.UseSqlServer(
+        builder.Configuration["ConnectionStrings:ProductionContextConnection"]);
+});
 
 var app = builder.Build();
 
@@ -22,5 +30,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+DbInitializer.Seed(app);
 
 app.Run();

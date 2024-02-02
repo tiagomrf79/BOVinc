@@ -4,13 +4,13 @@ using Production.API.Models;
 
 namespace Production.API.Infrastructure.EntityConfigurations;
 
-public class PeakTestFactorEntityTypeConfiguration : IEntityTypeConfiguration<PeakTestFactor>
+public class PeakTestFactorConfiguration : IEntityTypeConfiguration<PeakTestFactor>
 {
     public void Configure(EntityTypeBuilder<PeakTestFactor> builder)
     {
         builder.ToTable("PeakTestFactor");
 
-        builder.HasKey(x => new { x.DayOfFirstSampleMin, x.DayOfFirstSampleMax, x.TestIntervalMin, x.TestIntervalMax, x.IsFirstlactationCow })
+        builder.HasKey(x => new { x.DayOfFirstSampleMin, x.DayOfFirstSampleMax, x.TestIntervalMin, x.TestIntervalMax, x.IsFirstlactation })
             .HasName("PK_PeakTestFactor");
 
         builder.Property(x => x.DayOfFirstSampleMin)
@@ -25,7 +25,7 @@ public class PeakTestFactorEntityTypeConfiguration : IEntityTypeConfiguration<Pe
         builder.Property(x => x.TestIntervalMax)
             .IsRequired();
 
-        builder.Property(x => x.IsFirstlactationCow)
+        builder.Property(x => x.IsFirstlactation)
             .IsRequired();
 
         builder.Property(x => x.MilkFactor)

@@ -7,7 +7,7 @@ namespace Production.API.Infrastructure;
 public class ProductionContext : DbContext
 {
     public DbSet<Lactation> Lactations { get; set; }
-    public DbSet<MilkRecord> MilkRecords { get; set; }
+    public DbSet<TestSample> TestSamples { get; set; }
 
     public DbSet<FirstTestFactor> FirstTestFactors { get; set; }
     public DbSet<PeakTestFactor> PeakTestFactors { get; set; }
@@ -22,18 +22,18 @@ public class ProductionContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(
-            new LactationEntityTypeConfiguration());
+            new LactationConfiguration());
 
         modelBuilder.ApplyConfiguration(
-            new MilkRecordEntityTypeConfiguration());
+            new TestSampleConfiguration());
 
         modelBuilder.ApplyConfiguration(
-            new FirstTestFactorEntityTypeConfiguration());
+            new FirstTestFactorConfiguration());
 
         modelBuilder.ApplyConfiguration(
-            new PeakTestFactorEntityTypeConfiguration());
+            new PeakTestFactorConfiguration());
 
         modelBuilder.ApplyConfiguration(
-            new LastTestFactorEntityTypeConfiguration());
+            new LastTestFactorConfiguration());
     }
 }

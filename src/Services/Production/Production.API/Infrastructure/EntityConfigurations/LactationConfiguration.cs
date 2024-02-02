@@ -4,23 +4,22 @@ using Production.API.Models;
 
 namespace Production.API.Infrastructure.EntityConfigurations;
 
-public class MilkRecordEntityTypeConfiguration : IEntityTypeConfiguration<MilkRecord>
+public class LactationConfiguration : IEntityTypeConfiguration<Lactation>
 {
-    public void Configure(EntityTypeBuilder<MilkRecord> builder)
+    public void Configure(EntityTypeBuilder<Lactation> builder)
     {
-        builder.ToTable("MilkRecord");
+        builder.ToTable("Lactation");
 
         builder.HasKey(x => x.Id);
 
-        // With HiLo, EF fetches a block of values from the database to use as IDs
         builder.Property(x => x.Id)
-            .UseHiLo("milk_record_hilo")
             .IsRequired();
 
-        builder.Property(x => x.Date)
+        builder.Property(x => x.CalvingDate)
             .IsRequired();
 
         builder.Property(x => x.AnimalId)
             .IsRequired();
     }
 }
+

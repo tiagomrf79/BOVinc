@@ -4,13 +4,13 @@ using Production.API.Models;
 
 namespace Production.API.Infrastructure.EntityConfigurations;
 
-public class LastTestFactorEntityTypeConfiguration : IEntityTypeConfiguration<LastTestFactor>
+public class LastTestFactorConfiguration : IEntityTypeConfiguration<LastTestFactor>
 {
     public void Configure(EntityTypeBuilder<LastTestFactor> builder)
     {
         builder.ToTable("LastTestFactor");
 
-        builder.HasKey(x => new { x.DayOfLastSampleMin, x.DayOfLastSampleMax, x.TestIntervalMin, x.TestIntervalMax, x.IsFirstlactationCow })
+        builder.HasKey(x => new { x.DayOfLastSampleMin, x.DayOfLastSampleMax, x.TestIntervalMin, x.TestIntervalMax, x.IsFirstlactation })
             .HasName("PK_LastTestFactor");
 
         builder.Property(x => x.DayOfLastSampleMin)
@@ -25,7 +25,7 @@ public class LastTestFactorEntityTypeConfiguration : IEntityTypeConfiguration<La
         builder.Property(x => x.TestIntervalMax)
             .IsRequired();
 
-        builder.Property(x => x.IsFirstlactationCow)
+        builder.Property(x => x.IsFirstlactation)
             .IsRequired();
 
         builder.Property(x => x.MilkFactor)
