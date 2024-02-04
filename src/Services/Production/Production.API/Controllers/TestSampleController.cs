@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Production.API.DTOs;
+using Production.API.Enums;
 using Production.API.Infrastructure;
 using Production.API.Models;
 using System.ComponentModel.DataAnnotations;
@@ -22,8 +23,6 @@ public class TestSampleController : ControllerBase
         _logger = logger;
         _mapper = mapper;
     }
-
-    //Milk measurements are assigned to the given lactation at runtime
 
     [HttpPost]
     public async Task<ActionResult> CreateTestSample([FromBody] FullSampleDto dataReceived)
@@ -272,38 +271,7 @@ public class TestSampleController : ControllerBase
         [FromQuery] int animalId,
         [FromQuery] int lactationId)
     {
-        _logger.LogInformation(
-            "Begin call to {MethodName} for animal id {AnimalId} and lactation id {LactationId}",
-            nameof(GetTestSamplesForChart), animalId, lactationId);
-
-        List<YieldOnlySampleDto> testSamples = new();
-        List<YieldOnlySampleDto> adjustedSamples = new();
-
-        Lactation? lactation = await GetLactationById(lactationId);
-        if (lactation == null)
-        {
-            _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
-            return Ok(
-                new TestSamplesForChartVm(null, testSamples, adjustedSamples));
-        }
-
-        List<TestSample> queryResults = await _productionContext.TestSamples
-            .Where(x =>
-                x.AnimalId == animalId
-                && x.Date >= lactation.CalvingDate
-                && lactation.EndDate == null || x.Date < lactation.EndDate)
-            .ToListAsync();
-
-        testSamples = _mapper.Map<List<YieldOnlySampleDto>>(queryResults);
-
         throw new NotImplementedException();
-
-        TestSamplesForChartVm dtoToReturn = new(
-            lactation.CalvingDate,
-            testSamples,
-            adjustedSamples);
-
-        return Ok(dtoToReturn);
     }
 
     [HttpGet("Total")]
@@ -311,82 +279,7 @@ public class TestSampleController : ControllerBase
         [FromQuery] int animalId,
         [FromQuery] int lactationId)
     {
-        List<TotalsForTableVm> listToReturn = new();
-
-        _logger.LogInformation(
-            "Begin call to {MethodName} for animal id {AnimalId} and lactation id {LactationId}",
-            nameof(GetMilkTotalsForTable), animalId, lactationId);
-
-        Lactation? lactation = await _productionContext.Lactations.FindAsync(lactationId);
-        if (lactation == null)
-        {
-            _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
-            throw new NotImplementedException();
-        }
-
-        DateOnly calvingDate = lactation.CalvingDate;
-        DateOnly? endDate = lactation.EndDate;
-
-        var testSamples = _productionContext.TestSamples
-            .Where(x =>
-                x.AnimalId == animalId
-                && x.Date >= calvingDate
-                && endDate == null || x.Date < endDate)
-            .OrderBy(x => x.Date);
-
-        var milkYields = await testSamples
-            .Select(x => 
-                new YieldOnlySampleDto(
-                    x.Id,
-                    x.Date,
-                    x.MilkYield))
-            .ToListAsync();
-        var fatYields = await testSamples
-            .Where(x => x.FatPercentage != null)
-            .Select(x =>
-                new YieldOnlySampleDto(
-                    x.Id,
-                    x.Date,
-                    x.MilkYield * x.FatPercentage / 100 ?? 0))
-            .ToListAsync();
-        var proteinYields = await testSamples
-            .Where(x => x.ProteinPercentage != null)
-            .Select(x =>
-                new YieldOnlySampleDto(
-                    x.Id,
-                    x.Date,
-                    x.MilkYield * x.ProteinPercentage / 100 ?? 0))
-            .ToListAsync();
-
-        int totalMilkProduction = GetTotalProductionFromYields(milkYields, calvingDate, endDate);
-        int totalFatProduction = GetTotalProductionFromYields(fatYields, calvingDate, endDate);
-        int totalProteinProduction = GetTotalProductionFromYields(proteinYields, calvingDate, endDate);
-
-        listToReturn.Add(
-            new TotalsForTableVm(
-                Order: 1,
-                Name: "Actual production",
-                Totals: new[] {
-                    new TotalDto(
-                        MilkYield: totalMilkProduction,
-                        FatYield: totalFatProduction,
-                        ProteinYield: totalProteinProduction)}));
-
-        int adjustedMilkProduction = GetAdjustedTotalProductionFromYields(milkYields, calvingDate, endDate);
-        int adjustedFatProduction = GetAdjustedTotalProductionFromYields(fatYields, calvingDate, endDate);
-        int adjustedProteinProduction = GetAdjustedTotalProductionFromYields(proteinYields, calvingDate, endDate);
-
-        listToReturn.Add(
-            new TotalsForTableVm(
-                Order: 1,
-                Name: "Adjusted to 305 days",
-                Totals: new[] {
-                    new TotalDto(
-                        MilkYield: adjustedMilkProduction,
-                        FatYield: adjustedFatProduction,
-                        ProteinYield: adjustedProteinProduction)}));
-
-        return Ok(listToReturn);
+        throw new NotImplementedException();
     }
 
     private async Task<Lactation?> GetLactationByDate(int animalId, DateOnly date)
@@ -440,43 +333,6 @@ public class TestSampleController : ControllerBase
         // closed lactation => next lactation calving date
         return nextLactation.CalvingDate;
     }
-
-    private int GetTotalProductionFromYields(List<YieldOnlySampleDto> samples, DateOnly startDate, DateOnly? endDate)
-    {
-        int total = 0;
-        const MidpointRounding roundingMethod = MidpointRounding.AwayFromZero;
-
-        for (int i = 0; i < samples.Count; i++)
-        {
-            int daysInMilk = samples[i].Date.DayNumber - startDate.DayNumber;
-
-            if (i == 0)
-                total += (int)Math.Round(daysInMilk * samples[i].Yield, roundingMethod);
-            else
-                total += (int)Math.Round(daysInMilk * (samples[i-1].Yield + samples[i].Yield) / 2, roundingMethod);
-
-            if (endDate != null && i == samples.Count - 1)
-            {
-                int remainingDays = endDate?.DayNumber - samples[i].Date.DayNumber ?? 0;
-                total += (int)Math.Round(remainingDays * samples[i].Yield, roundingMethod);
-            }
-        }
-
-        return total;
-    }
-
-    private int GetAdjustedTotalProductionFromYields(List<YieldOnlySampleDto> samples, DateOnly startDate, DateOnly? endDate)
-    {
-        int total = 0;
-        const MidpointRounding roundingMethod = MidpointRounding.AwayFromZero;
-
-        for (int i = 0; i < samples.Count; i++)
-        {
-            total += (int)Math.Round(samples[i].Yield, roundingMethod);
-        }
-
-        return total;
-    }
 }
 
 //  get all measurements and calving date for a given animal and lactation: GET recordings
@@ -485,3 +341,4 @@ public class TestSampleController : ControllerBase
 //  delete one measurement: DELETE recordings/1
 //get all measurements and all predictions and calving date for a given animal and lactation: GET recordings/chart
 //get measurement total and prediction total for a given animal and lactation: GET recordings/total
+ 

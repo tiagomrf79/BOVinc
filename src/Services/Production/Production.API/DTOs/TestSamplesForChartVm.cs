@@ -3,4 +3,4 @@
 public record TestSamplesForChartVm(
     DateOnly? CalvingDate,
     IEnumerable<YieldOnlySampleDto> TestSamples,
-    IEnumerable<YieldOnlySampleDto> AdjustedSamples);
+    IEnumerable<YieldOnlySampleDto> TestSamplesWithPrediction);

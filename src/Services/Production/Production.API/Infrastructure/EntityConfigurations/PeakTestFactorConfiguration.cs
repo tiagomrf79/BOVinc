@@ -10,13 +10,13 @@ public class PeakTestFactorConfiguration : IEntityTypeConfiguration<PeakTestFact
     {
         builder.ToTable("PeakTestFactor");
 
-        builder.HasKey(x => new { x.DayOfFirstSampleMin, x.DayOfFirstSampleMax, x.TestIntervalMin, x.TestIntervalMax, x.IsFirstlactation })
+        builder.HasKey(x => new { x.DayOfPreviousSampleMin, x.DayOfPreviousSampleMax, x.TestIntervalMin, x.TestIntervalMax, x.IsFirstlactation })
             .HasName("PK_PeakTestFactor");
 
-        builder.Property(x => x.DayOfFirstSampleMin)
+        builder.Property(x => x.DayOfPreviousSampleMin)
             .IsRequired();
 
-        builder.Property(x => x.DayOfFirstSampleMax)
+        builder.Property(x => x.DayOfPreviousSampleMax)
             .IsRequired();
 
         builder.Property(x => x.TestIntervalMin)

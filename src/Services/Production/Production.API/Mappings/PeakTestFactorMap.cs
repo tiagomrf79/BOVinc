@@ -7,9 +7,9 @@ public class PeakTestFactorMap : ClassMap<PeakTestFactor>
 {
     public PeakTestFactorMap()
     {
-        Map(x => x.DayOfFirstSampleMin).Index(0);
+        Map(x => x.DayOfPreviousSampleMin).Index(0);
 
-        Map(x => x.DayOfFirstSampleMax).Index(1);
+        Map(x => x.DayOfPreviousSampleMax).Index(1);
 
         Map(x => x.TestIntervalMin).Index(2);
 

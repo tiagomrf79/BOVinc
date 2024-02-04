@@ -8,7 +8,7 @@ namespace Production.API.Infrastructure;
 
 public static class DbInitializer
 {
-    public static void Seed(IApplicationBuilder applicationBuilder)
+    public static void ImportFactors(IApplicationBuilder applicationBuilder)
     {
         ProductionContext context = applicationBuilder.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<ProductionContext>();
 

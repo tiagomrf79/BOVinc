@@ -2,8 +2,8 @@
 
 public class PeakTestFactor
 {
-    public int DayOfFirstSampleMin { get; set; }
-    public int DayOfFirstSampleMax { get; set; }
+    public int DayOfPreviousSampleMin { get; set; }
+    public int DayOfPreviousSampleMax { get; set; }
 
     public int TestIntervalMin { get; set; }
     public int TestIntervalMax { get; set; }

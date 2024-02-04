@@ -31,6 +31,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-DbInitializer.Seed(app);
+DbInitializer.ImportFactors(app);
 
 app.Run();
