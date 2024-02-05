@@ -27,4 +27,13 @@ public class LactationRepository : ILactationRepository
             .FirstOrDefaultAsync();
     }
 
+    public async Task<Lactation?> GetSubsequentLactationAsync(Lactation lactation)
+    {
+        return await _context.Lactations
+            .Where(x =>
+                x.AnimalId == lactation.AnimalId
+                && x.CalvingDate > lactation.CalvingDate)
+            .OrderBy(x => x.CalvingDate)
+            .FirstOrDefaultAsync();
+    }
 }

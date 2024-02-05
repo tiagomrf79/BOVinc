@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Production.API.Infrastructure;
+using Production.API.Infrastructure.Repositories;
+using Production.API.Services;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,12 @@ builder.Services.AddDbContext<ProductionContext>(options =>
     options.UseSqlServer(
         builder.Configuration["ConnectionStrings:ProductionContextConnection"]);
 });
+
+builder.Services.AddScoped<ILactationRepository, LactationRepository>();
+builder.Services.AddScoped<ITestSampleRepository, TestSampleRepository>();
+builder.Services.AddScoped<IYieldFactorRepository, YieldFactorRepository>();
+
+builder.Services.AddScoped<ILactationService, LactationService>();
 
 var app = builder.Build();
 

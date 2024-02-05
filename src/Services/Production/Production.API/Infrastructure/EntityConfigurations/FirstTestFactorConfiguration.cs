@@ -4,9 +4,9 @@ using Production.API.Models;
 
 namespace Production.API.Infrastructure.EntityConfigurations;
 
-public class FirstTestFactorConfiguration : IEntityTypeConfiguration<FirstTestFactor>
+public class FirstTestFactorConfiguration : IEntityTypeConfiguration<YieldFactors>
 {
-    public void Configure(EntityTypeBuilder<FirstTestFactor> builder)
+    public void Configure(EntityTypeBuilder<YieldFactors> builder)
     {
         builder.ToTable("FirstTestFactor");
 

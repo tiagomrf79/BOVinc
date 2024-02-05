@@ -3,7 +3,7 @@ using Production.API.Models;
 
 namespace Production.API.Mappings;
 
-public class FirstTestFactorMap : ClassMap<FirstTestFactor>
+public class FirstTestFactorMap : ClassMap<YieldFactors>
 {
     public FirstTestFactorMap()
     {

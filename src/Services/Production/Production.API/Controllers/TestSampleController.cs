@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Production.API.DTOs;
 using Production.API.Infrastructure.Repositories;
 using Production.API.Models;
+using Production.API.Services;
 using System.ComponentModel.DataAnnotations;
 
 namespace Production.API.Controllers;
@@ -14,13 +14,19 @@ public class TestSampleController : ControllerBase
 {
     private readonly ITestSampleRepository _testSampleRepository;
     private readonly ILactationRepository _lactationRepository;
+    private readonly ILactationService _lactationService;
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
 
-    public TestSampleController(ITestSampleRepository testSampleRepository, ILactationRepository lactationRepository, ILogger logger, IMapper mapper)
+    public TestSampleController(
+        ITestSampleRepository testSampleRepository,
+        ILactationRepository lactationRepository,
+        ILactationService lactationService,
+        ILogger logger, IMapper mapper)
     {
         _testSampleRepository = testSampleRepository;
         _lactationRepository = lactationRepository;
+        _lactationService = lactationService;
         _logger = logger;
         _mapper = mapper;
     }
@@ -240,8 +246,7 @@ public class TestSampleController : ControllerBase
         if (lactation == null)
         {
             _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
-            return Ok(
-                new TestSamplesForTableVm(null, testSamples));
+            return Ok(new TestSamplesForTableVm(null, testSamples));
         }
 
         IEnumerable<TestSample> queryResults = await _testSampleRepository.GetSortedTestSamplesForPeriodAsync(animalId, lactation.CalvingDate, lactation.EndDate);
@@ -269,14 +274,50 @@ public class TestSampleController : ControllerBase
         [FromQuery] int animalId,
         [FromQuery] int lactationId)
     {
-        throw new NotImplementedException();
+        _logger.LogInformation(
+            "Begin call to {MethodName} for animal id {AnimalId} and lactation id {LactationId}",
+            nameof(GetMilkTotalsForTable), animalId, lactationId);
+
+        Lactation? lactation = await GetLactationById(lactationId);
+        if (lactation == null)
+        {
+            _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
+            return Ok(new List<TotalsForTableVm>());
+        }
+
+        var yields = await _testSampleRepository.GetSortedTestSamplesForPeriodAsync(animalId, lactation.CalvingDate, lactation.EndDate);
+
+        List<double> milkYields = yields.Select(x => x.MilkYield).ToList();
+        List<double?> fatYields = yields.Select(x => x.FatPercentage).ToList();
+        List<double?> proteinYields = yields.Select(x => x.ProteinPercentage).ToList();
+        List<int> daysInMilk = yields.Select(x => x.Date.DayNumber - lactation.CalvingDate.DayNumber).ToList();
+
+        Tuple<int, int, int> actualYields = await _lactationService.GetTotalYield(milkYields, fatYields, proteinYields, daysInMilk, lactation.Number);
+        Tuple<int, int, int> adjustedYields = await _lactationService.GetTotalYieldStandardized(milkYields, fatYields, proteinYields, daysInMilk, lactation.Number);
+
+        var actualTotals = new List<TotalDto>() {
+            new TotalDto(
+                MilkYield: actualYields.Item1,
+                FatYield: actualYields.Item2,
+                ProteinYield: actualYields.Item3)};
+
+        var adjustedTotals = new List<TotalDto>() {
+            new TotalDto(
+                MilkYield: adjustedYields.Item1,
+                FatYield: adjustedYields.Item2,
+                ProteinYield: adjustedYields.Item3)};
+
+        var listToReturn = new List<TotalsForTableVm>()
+        {
+            new TotalsForTableVm(Order: 1, Name: "Actual production", Totals: actualTotals),
+            new TotalsForTableVm(Order: 2, Name: "Adjusted to 305 days", Totals: adjustedTotals)
+        };
+
+        return Ok(listToReturn);
     }
 
     private async Task<Lactation?> GetLactationByDate(int animalId, DateOnly date)
     {
-        //IQueryable<Lactation> lactations = _lactationRepository.GetSortedLactationsForAnimal(animalId);
-
-        // get latest lactation that starts before the given date
         Lactation? currentLactation = await _lactationRepository.GetLactationByDateAsync(animalId, date);
 
         // no match for given date
@@ -306,12 +347,7 @@ public class TestSampleController : ControllerBase
         if (lactation.EndDate != null)
             return lactation.EndDate;
 
-        Lactation? nextLactation = await _productionContext.Lactations
-            .Where(x =>
-                x.AnimalId == lactation.AnimalId
-                && x.CalvingDate > lactation.CalvingDate)
-            .OrderBy(x => x.CalvingDate)
-            .FirstOrDefaultAsync();
+        Lactation? nextLactation = await _lactationRepository.GetSubsequentLactationAsync(lactation);
 
         // ongoing lactation => no end date
         if (nextLactation == null)

@@ -6,5 +6,5 @@ public interface ILactationRepository
 {
     Task<Lactation?> GetLactationByIdAsync(int id);
     Task<Lactation?> GetLactationByDateAsync(int animalId, DateOnly date);
-    Task<Lactation?> 
+    Task<Lactation?> GetSubsequentLactationAsync(Lactation lactation);
 }

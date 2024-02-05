@@ -1,25 +1,96 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Production.API.Infrastructure;
+﻿using Production.API.Infrastructure.Repositories;
 
 namespace Production.API.Services;
 
-public class LactationRecord
+public class LactationService : ILactationService
 {
-    private readonly ProductionContext _productionContext;
+    private readonly IYieldFactorRepository _yieldFactorRepository;
 
-    public LactationRecord(ProductionContext productionContext)
+    public LactationService(IYieldFactorRepository yieldFactorRepository)
     {
-        _productionContext = productionContext;
+        _yieldFactorRepository = yieldFactorRepository;
     }
 
-    private async Task<List<IntervalYield>> CalculateRecordedYield(YieldTrait yieldTrait, List<YieldRecord> yields, int lactationNumber)
+    public async Task<Tuple<int, int, int>> GetTotalYield(
+        List<double> milkYields,
+        List<double?> fatYields,
+        List<double?> proteinYields,
+        List<int> daysInMilk,
+        int lactationNumber)
+    {
+        // all lists should have the same number of items or empty is returned
+        if (daysInMilk.Count != milkYields.Count
+            || daysInMilk.Count != fatYields.Count
+            || daysInMilk.Count != proteinYields.Count)
+        {
+            return Tuple.Create(0, 0, 0);
+        }
+
+        bool isFirstLactation = lactationNumber == 1;
+
+        int milkTotal = await GetTotalYieldForTrait(YieldTrait.Milk, daysInMilk, milkYields, isFirstLactation);
+        int fatTotal = await GetTotalYieldForTrait(YieldTrait.Fat, daysInMilk, fatYields, isFirstLactation);
+        int proteinTotal = await GetTotalYieldForTrait(YieldTrait.Protein, daysInMilk, proteinYields, isFirstLactation);
+
+        return Tuple.Create(milkTotal, fatTotal, proteinTotal);
+    }
+
+    public async Task<Tuple<int, int, int>> GetTotalYieldStandardized(
+        List<double> milkYields,
+        List<double?> fatYields,
+        List<double?> proteinYields,
+        List<int> daysInMilk,
+        int lactationNumber)
+    {
+        // all lists should have the same number of items or empty is returned
+        if (daysInMilk.Count != milkYields.Count
+            || daysInMilk.Count != fatYields.Count
+            || daysInMilk.Count != proteinYields.Count)
+        {
+            return Tuple.Create(0, 0, 0);
+        }
+
+        bool isFirstLactation = lactationNumber == 1;
+
+        int milkTotal = await Get305DaysYieldForTrait(YieldTrait.Milk, daysInMilk, milkYields, isFirstLactation);
+        int fatTotal = await Get305DaysYieldForTrait(YieldTrait.Fat, daysInMilk, fatYields, isFirstLactation);
+        int proteinTotal = await Get305DaysYieldForTrait(YieldTrait.Protein, daysInMilk, proteinYields, isFirstLactation);
+
+        return Tuple.Create(milkTotal, fatTotal, proteinTotal);
+    }
+
+    public async Task<List<Tuple<DateOnly, double, bool>>> GetLactationCurve(
+        List<double> milkYields,
+        List<int> daysInMilk,
+        int lactationNumber)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task<int> GetTotalYieldForTrait(YieldTrait trait, List<int> days, List<double> yields, bool isFirstLactation)
+    {
+        List<YieldRecord> records = days.Zip(yields, (x, y) => new YieldRecord(x, y)).ToList();
+        List<IntervalYield> intervals = await GetIntervalYields(trait, records, isFirstLactation);
+        double total = intervals.Sum(x => (x.End - x.Start) * x.Yield);
+
+        return (int)Math.Round(total, MidpointRounding.AwayFromZero);
+    }
+
+    private async Task<int> Get305DaysYieldForTrait(YieldTrait trait, List<int> days, List<double> yields, bool isFirstLactation)
+    {
+        List<YieldRecord> records = days.Zip(yields, (x, y) => new YieldRecord(x, y)).ToList();
+        List<IntervalYield> intervals = await GetIntervalYieldsFor305Days(trait, records, isFirstLactation);
+        double total = intervals.Sum(x => (x.End - x.Start) * x.Yield);
+
+        return (int)Math.Round(total, MidpointRounding.AwayFromZero);
+    }
+
+    private async Task<List<IntervalYield>> GetIntervalYields(YieldTrait yieldTrait, List<YieldRecord> yields, bool isFirstLactation)
     {
         yields = yields
             .Where(x => x.DaysInMilk >= 6) // ignore test-day samples on the first 5 days after calving
             .OrderBy(x => x.DaysInMilk)
             .ToList();
-
-        bool isFirstLactation = lactationNumber == 1;
 
         List<IntervalYield> intervalYields = new();
 
@@ -70,14 +141,12 @@ public class LactationRecord
         return intervalYields;
     }
 
-    private async Task<List<IntervalYield>> AdjustYieldTo305Days(YieldTrait yieldTrait, List<YieldRecord> yields, int lactationNumber)
+    private async Task<List<IntervalYield>> GetIntervalYieldsFor305Days(YieldTrait yieldTrait, List<YieldRecord> yields, bool isFirstLactation)
     {
         yields = yields
             .Where(x => x.DaysInMilk >= 6) // ignore test-day samples on the first 5 days after calving
             .OrderBy(x => x.DaysInMilk)
             .ToList();
-
-        bool isFirstLactation = lactationNumber == 1;
 
         List<IntervalYield> intervalYields = new();
 
@@ -149,41 +218,30 @@ public class LactationRecord
         return intervalYields;
     }
 
-    private async Task<double> GetFactorForTestIntervalAtPeakOfLactation(
-        YieldTrait yieldTrait, int daysInMilk, int daysInTestInterval, bool isFirstLactation)
+    private async Task<double> GetFactorForFirstTestInterval(YieldTrait yieldTrait, int daysInMilk, bool isFirstLactation)
     {
-        var row = _productionContext.PeakTestFactors
-            .Where(x => 
-                x.IsFirstlactation == isFirstLactation
-                && daysInMilk >= x.DayOfPreviousSampleMin
-                && daysInMilk <= x.DayOfPreviousSampleMax
-                && daysInTestInterval >= x.TestIntervalMin
-                && daysInTestInterval <= x.TestIntervalMax);
-
         if (yieldTrait == YieldTrait.Milk)
-            return await row.Select(x => x.MilkFactor).FirstOrDefaultAsync();
+            return await _yieldFactorRepository.GetMilkFactorForFirstTestIntervalAsync(daysInMilk, isFirstLactation);
         else if (yieldTrait == YieldTrait.Fat)
-            return await row.Select(x => x.FatFactor).FirstOrDefaultAsync();
+            return await _yieldFactorRepository.GetFatFactorForFirstTestIntervalAsync(daysInMilk, isFirstLactation);
         else if (yieldTrait == YieldTrait.Protein)
-            return await row.Select(x => x.ProteinFactor).FirstOrDefaultAsync();
+            return await _yieldFactorRepository.GetProteinFactorForFirstTestIntervalAsync(daysInMilk, isFirstLactation);
 
         return 1;
     }
 
-    private async Task<double> GetFactorForFirstTestInterval(YieldTrait yieldTrait, int daysInMilk, bool isFirstLactation)
+    private async Task<double> GetFactorForTestIntervalAtPeakOfLactation(
+        YieldTrait yieldTrait, int daysInMilk, int daysInTestInterval, bool isFirstLactation)
     {
-        var row = _productionContext.FirstTestFactors
-            .Where(x => 
-                x.IsFirstlactation == isFirstLactation
-                && daysInMilk >= x.DayOfFirstSampleMin
-                && daysInMilk <= x.DayOfFirstSampleMax);
-
         if (yieldTrait == YieldTrait.Milk)
-            return await row.Select(x => x.MilkFactor).FirstOrDefaultAsync();
+            return await _yieldFactorRepository.GetMilkFactorForTestIntervalAtPeakOfLactationAsync(
+                daysInMilk, daysInTestInterval, isFirstLactation);
         else if (yieldTrait == YieldTrait.Fat)
-            return await row.Select(x => x.FatFactor).FirstOrDefaultAsync();
+            return await _yieldFactorRepository.GetFatFactorForTestIntervalAtPeakOfLactationAsync(
+                daysInMilk, daysInTestInterval, isFirstLactation);
         else if (yieldTrait == YieldTrait.Protein)
-            return await row.Select(x => x.ProteinFactor).FirstOrDefaultAsync();
+            return await _yieldFactorRepository.GetProteinFactorForTestIntervalAtPeakOfLactationAsync(
+                daysInMilk, daysInTestInterval, isFirstLactation);
 
         return 1;
     }
@@ -191,20 +249,15 @@ public class LactationRecord
     private async Task<double> GetFactorForTestIntervalAfterLastSampleDay(
         YieldTrait yieldTrait, int daysInMilk, int daysInTestInterval, bool isFirstLactation)
     {
-        var row = _productionContext.LastTestFactors
-            .Where(x =>
-                x.IsFirstlactation == isFirstLactation
-                && daysInMilk >= x.DayOfLastSampleMin
-                && daysInMilk <= x.DayOfLastSampleMax
-                && daysInTestInterval >= x.TestIntervalMin
-                && daysInTestInterval <= x.TestIntervalMax);
-
         if (yieldTrait == YieldTrait.Milk)
-            return await row.Select(x => x.MilkFactor).FirstOrDefaultAsync();
+            return await _yieldFactorRepository.GetMilkFactorForTestIntervalAfterLastSampleDayAsync(
+                daysInMilk, daysInTestInterval, isFirstLactation);
         else if (yieldTrait == YieldTrait.Fat)
-            return await row.Select(x => x.FatFactor).FirstOrDefaultAsync();
+            return await _yieldFactorRepository.GetFatFactorForTestIntervalAfterLastSampleDayAsync(
+                daysInMilk, daysInTestInterval, isFirstLactation);
         else if (yieldTrait == YieldTrait.Protein)
-            return await row.Select(x => x.ProteinFactor).FirstOrDefaultAsync();
+            return await _yieldFactorRepository.GetProteinFactorForTestIntervalAfterLastSampleDayAsync(
+                daysInMilk, daysInTestInterval, isFirstLactation);
 
         return 1;
     }

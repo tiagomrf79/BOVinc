@@ -14,7 +14,7 @@ public static class DbInitializer
 
         if (!context.FirstTestFactors.Any())
         {
-            IEnumerable<FirstTestFactor> firstTestFactors;
+            IEnumerable<YieldFactors> firstTestFactors;
 
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "FactorsForAdjustingSampleDayYieldForFirstTestInterval.csv");
 
@@ -24,7 +24,7 @@ public static class DbInitializer
             using (var csv = new CsvReader(reader, configuration))
             {
                 csv.Context.RegisterClassMap<FirstTestFactorMap>();
-                firstTestFactors = csv.GetRecords<FirstTestFactor>();
+                firstTestFactors = csv.GetRecords<YieldFactors>();
             }
 
             context.FirstTestFactors.AddRange(firstTestFactors);
