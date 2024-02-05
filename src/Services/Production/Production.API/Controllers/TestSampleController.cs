@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Production.API.DTOs;
-using Production.API.Enums;
-using Production.API.Infrastructure;
+using Production.API.Infrastructure.Repositories;
 using Production.API.Models;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,13 +12,15 @@ namespace Production.API.Controllers;
 [ApiController]
 public class TestSampleController : ControllerBase
 {
-    private readonly ProductionContext _productionContext;
+    private readonly ITestSampleRepository _testSampleRepository;
+    private readonly ILactationRepository _lactationRepository;
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
 
-    public TestSampleController(ProductionContext context, ILogger logger, IMapper mapper)
+    public TestSampleController(ITestSampleRepository testSampleRepository, ILactationRepository lactationRepository, ILogger logger, IMapper mapper)
     {
-        _productionContext = context ?? throw new ArgumentNullException(nameof(context));
+        _testSampleRepository = testSampleRepository;
+        _lactationRepository = lactationRepository;
         _logger = logger;
         _mapper = mapper;
     }
@@ -72,15 +73,7 @@ public class TestSampleController : ControllerBase
             return BadRequest(problemDetails);
         }
 
-        bool alreadyExists = await _productionContext.TestSamples
-            .Where(x =>
-                x.AnimalId == dataReceived.AnimalId
-                && x.Date == dataReceived.Date
-                && x.MilkYield == dataReceived.MilkYield
-                && x.FatPercentage == dataReceived.FatPercentage
-                && x.ProteinPercentage == dataReceived.ProteinPercentage
-                && x.SomaticCellCount == dataReceived.SomaticCellCount
-            ).AnyAsync();
+        bool alreadyExists = await _testSampleRepository.IsTestSampleDuplicatedAsync(dataReceived.AnimalId, dataReceived.Date, dataReceived.MilkYield);
 
         // Don't allow duplicate measurements (same animal, date, milk, fat, protein and SCC)
         if (alreadyExists)
@@ -96,10 +89,8 @@ public class TestSampleController : ControllerBase
             return BadRequest(problemDetails);
         }
 
-        recordToAdd.CreatedAt = DateTime.UtcNow;
-        recordToAdd.LastUpdatedAt = recordToAdd.CreatedAt;
-        await _productionContext.TestSamples.AddAsync(recordToAdd);
-        await _productionContext.SaveChangesAsync();
+        await _testSampleRepository.CreateTestSampleAsync(recordToAdd);
+        await _testSampleRepository.CommitChangesAsync();
 
         return CreatedAtAction(
             actionName: nameof(CreateTestSample),
@@ -114,8 +105,21 @@ public class TestSampleController : ControllerBase
             "Begin call to {MethodName} for updating test sample {id} with data {DataReceived}",
             nameof(UpdateTestSample), dataReceived.Id , dataReceived);
 
-        var recordToUpdate = await _productionContext.TestSamples.FindAsync(dataReceived.Id);
-        
+        if (dataReceived.Id == null)
+        {
+            ProblemDetails problemDetails = new()
+            {
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
+                Title = "Invalid request.",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"The request is missing the test sample id."
+            };
+
+            return BadRequest(problemDetails);
+        }
+
+        var recordToUpdate = await _testSampleRepository.GetTestSampleByIdAsync((int)dataReceived.Id);
+
         // Check if record exists
         if (recordToUpdate == null)
         {
@@ -171,18 +175,10 @@ public class TestSampleController : ControllerBase
             return BadRequest(problemDetails);
         }
 
-        bool alreadyExists = await _productionContext.TestSamples
-            .Where(x =>
-                x.Id != dataReceived.Id
-                && x.AnimalId == dataReceived.AnimalId
-                && x.Date == dataReceived.Date
-                && x.MilkYield == dataReceived.MilkYield
-                && x.FatPercentage == dataReceived.FatPercentage
-                && x.ProteinPercentage == dataReceived.ProteinPercentage
-                && x.SomaticCellCount == dataReceived.SomaticCellCount
-            ).AnyAsync();
+        bool alreadyExists = await _testSampleRepository.IsTestSampleDuplicatedAsync(
+            dataReceived.AnimalId, dataReceived.Date, dataReceived.MilkYield, dataReceived.Id);
 
-        // Don't allow duplicate measurements (same animal, date, milk, fat, protein and SCC)
+        // Don't allow duplicate measurements (same animal, date and milk)
         if (alreadyExists)
         {
             ProblemDetails problemDetails = new()
@@ -196,9 +192,8 @@ public class TestSampleController : ControllerBase
             return BadRequest(problemDetails);
         }
 
-        recordToUpdate.LastUpdatedAt = DateTime.UtcNow;
-        _productionContext.Update(recordToUpdate);
-        await _productionContext.SaveChangesAsync();
+        _testSampleRepository.UpdateTestSample(recordToUpdate);
+        await _testSampleRepository.CommitChangesAsync();
 
         return Ok();
     }
@@ -208,7 +203,7 @@ public class TestSampleController : ControllerBase
     {
         _logger.LogInformation("Begin call to {MethodName} for deleting test sample {id}", nameof(DeleteTestSample), id);
 
-        var recordToDelete = await _productionContext.TestSamples.FindAsync(id);
+        var recordToDelete = await _testSampleRepository.GetTestSampleByIdAsync(id);
 
         // Check if record exists
         if (recordToDelete == null)
@@ -224,8 +219,8 @@ public class TestSampleController : ControllerBase
             return NotFound(problemDetails);
         }
 
-        _productionContext.Remove(recordToDelete);
-        await _productionContext.SaveChangesAsync();
+        _testSampleRepository.DeleteTestSample(recordToDelete);
+        await _testSampleRepository.CommitChangesAsync();
 
         return NoContent();
     }
@@ -249,12 +244,7 @@ public class TestSampleController : ControllerBase
                 new TestSamplesForTableVm(null, testSamples));
         }
 
-        List<TestSample> queryResults = await _productionContext.TestSamples
-            .Where(x =>
-                x.AnimalId == animalId
-                && x.Date >= lactation.CalvingDate
-                && lactation.EndDate == null || x.Date < lactation.EndDate)
-            .ToListAsync();
+        IEnumerable<TestSample> queryResults = await _testSampleRepository.GetSortedTestSamplesForPeriodAsync(animalId, lactation.CalvingDate, lactation.EndDate);
 
         testSamples = _mapper.Map<List<FullSampleDto>>(queryResults);
 
@@ -284,13 +274,10 @@ public class TestSampleController : ControllerBase
 
     private async Task<Lactation?> GetLactationByDate(int animalId, DateOnly date)
     {
-        var lactations = _productionContext.Lactations.Where(x => x.AnimalId == animalId);
+        //IQueryable<Lactation> lactations = _lactationRepository.GetSortedLactationsForAnimal(animalId);
 
         // get latest lactation that starts before the given date
-        Lactation? currentLactation = await lactations
-            .Where(x => x.CalvingDate <= date)
-            .OrderByDescending(x => x.CalvingDate)
-            .FirstOrDefaultAsync();
+        Lactation? currentLactation = await _lactationRepository.GetLactationByDateAsync(animalId, date);
 
         // no match for given date
         if (currentLactation == null)
@@ -303,7 +290,7 @@ public class TestSampleController : ControllerBase
 
     private async Task<Lactation?> GetLactationById(int lactationId)
     {
-        Lactation? currentLactation = await _productionContext.Lactations.FindAsync(lactationId);
+        Lactation? currentLactation = await _lactationRepository.GetLactationByIdAsync(lactationId);
 
         // no match for given id
         if (currentLactation == null)

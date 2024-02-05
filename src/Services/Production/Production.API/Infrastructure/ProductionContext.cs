@@ -21,19 +21,11 @@ public class ProductionContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(
-            new LactationConfiguration());
+        modelBuilder.ApplyConfiguration(new LactationConfiguration());
+        modelBuilder.ApplyConfiguration(new TestSampleConfiguration());
 
-        modelBuilder.ApplyConfiguration(
-            new TestSampleConfiguration());
-
-        modelBuilder.ApplyConfiguration(
-            new FirstTestFactorConfiguration());
-
-        modelBuilder.ApplyConfiguration(
-            new PeakTestFactorConfiguration());
-
-        modelBuilder.ApplyConfiguration(
-            new LastTestFactorConfiguration());
+        modelBuilder.ApplyConfiguration(new FirstTestFactorConfiguration());
+        modelBuilder.ApplyConfiguration(new PeakTestFactorConfiguration());
+        modelBuilder.ApplyConfiguration(new LastTestFactorConfiguration());
     }
 }

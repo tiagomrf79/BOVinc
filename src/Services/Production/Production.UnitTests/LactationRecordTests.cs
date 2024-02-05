@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
-using Production.API.Infrastructure;
+using Production.API.Models;
 
 namespace Production.UnitTests
 {
@@ -9,9 +9,6 @@ namespace Production.UnitTests
         [Fact]
         public async Task Test1()
         {
-            var options = new DbContextOptionsBuilder<ProductionContext>().UseSqlServer().Options;
-            var context = new ProductionContext(options);
-            
         }
     }
 }
