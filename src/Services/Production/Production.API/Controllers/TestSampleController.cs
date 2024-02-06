@@ -287,7 +287,40 @@ public class TestSampleController : ControllerBase
 
         var yields = await _testSampleRepository.GetSortedTestSamplesForPeriodAsync(animalId, lactation.CalvingDate, lactation.EndDate);
 
-        List<double> milkYields = yields.Select(x => x.MilkYield).ToList();
+        List<YieldRecordDto> milkRecords = yields
+            .Select(x => new YieldRecordDto(x.Date.DayNumber - lactation.CalvingDate.DayNumber, x.MilkYield))
+            .ToList();
+
+        List<YieldRecordDto> fatRecords = yields
+            .Where(x => x.FatPercentage != null)
+            .Select(x => new YieldRecordDto(x.Date.DayNumber - lactation.CalvingDate.DayNumber, x.MilkYield * x.FatPercentage!.Value / 100))
+            .ToList();
+
+        List<YieldRecordDto> proteinRecords = yields
+            .Where(x => x.ProteinPercentage != null)
+            .Select(x => new YieldRecordDto(x.Date.DayNumber - lactation.CalvingDate.DayNumber, x.MilkYield * x.ProteinPercentage!.Value / 100))
+            .ToList();
+
+        /*
+            lactation service input should be one of the following:
+         
+            lactation service output could be one of the following?
+            - dim at start, dim at end, interval yield
+                * most logical and accurate
+            - dim at start, interval duration, interval yield
+            - days in milk, adjusted yield
+                * needs further operation to calculate total
+            
+            fat yield can be calculated by using milk interval(s) yield(s) * fat percentage?
+         */
+
+        var adjustedMilkYields = await _lactationService.GetAdjustedMilkYields(milkRecords, lactation.Number);
+        //var fatIntervals = await _lactationService.getf
+        var milkTotal = adjustedMilkYields.Sum(x => x.DaysInMilk * x.Yield);
+
+
+
+        //List<double> milkYields = yields.Select(x => x.MilkYield).ToList();
         List<double?> fatYields = yields.Select(x => x.FatPercentage).ToList();
         List<double?> proteinYields = yields.Select(x => x.ProteinPercentage).ToList();
         List<int> daysInMilk = yields.Select(x => x.Date.DayNumber - lactation.CalvingDate.DayNumber).ToList();

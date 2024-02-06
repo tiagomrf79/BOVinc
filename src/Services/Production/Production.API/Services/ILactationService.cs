@@ -1,22 +1,14 @@
-﻿namespace Production.API.Services;
+﻿using Production.API.DTOs;
+
+namespace Production.API.Services;
 
 public interface ILactationService
 {
-    Task<Tuple<int, int, int>> GetTotalYield(
-        List<double> milkYields,
-        List<double?> fatYields,
-        List<double?> proteinYields,
-        List<int> daysInMilk,
-        int lactationNumber);
-    Task<Tuple<int, int, int>> GetTotalYieldStandardized(
-        List<double> milkYields,
-        List<double?> fatYields,
-        List<double?> proteinYields,
-        List<int> daysInMilk,
-        int lactationNumber);
-
-    Task<List<Tuple<DateOnly, double, bool>>> GetLactationCurve(
-        List<double> milkYields,
-        List<int> daysInMilk,
-        int lactationNumber);
+    Task<List<YieldRecordDto>> GetAdjustedMilkYields(List<YieldRecordDto> records, int lactationNumber);
+    Task<int> GetFatTotalYieldAsync(List<YieldRecordDto> records, int lactationNumber);
+    Task<int> GetProteinTotalYieldAsync(List<YieldRecordDto> records, int lactationNumber);
+    Task<int> GetMilkTotalYieldStandardizedAsync(List<YieldRecordDto> records, int lactationNumber);
+    Task<int> GetFatTotalYieldStandardizedAsync(List<YieldRecordDto> records, int lactationNumber);
+    Task<int> GetProteinTotalYieldStandardizedAsync(List<YieldRecordDto> records, int lactationNumber);
+    Task<List<Tuple<DateOnly, double, bool>>> GetLactationCurve(List<YieldRecordDto> records, int lactationNumber);
 }
