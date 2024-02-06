@@ -12,60 +12,40 @@ public class LactationService : ILactationService
         _yieldFactorRepository = yieldFactorRepository;
     }
 
-    public async Task<List<YieldRecordDto>> GetAdjustedMilkYields(List<YieldRecordDto> records, int lactationNumber)
+    public async Task<List<IntervalYieldDto>> GetAdjustedMilkYields(List<YieldRecordDto> records, int lactationNumber)
     {
         bool isFirstLactation = lactationNumber == 1;
         return await GetAdjustedYields(YieldTrait.Milk , records, isFirstLactation);
     }
 
-    public async Task<int> GetFatTotalYieldAsync(List<YieldRecordDto> records, int lactationNumber)
+    public async Task<List<IntervalYieldDto>> GetAdjustedFatYields(List<YieldRecordDto> records, int lactationNumber)
     {
         bool isFirstLactation = lactationNumber == 1;
-
-        List<YieldRecordDto> intervals = await GetAdjustedYields(YieldTrait.Fat, records, isFirstLactation);
-        double total = intervals.Sum(x => (x.End - x.Start) * x.Yield);
-
-        return (int)Math.Round(total, MidpointRounding.AwayFromZero);
+        return await GetAdjustedYields(YieldTrait.Fat, records, isFirstLactation);
     }
 
-    public async Task<int> GetProteinTotalYieldAsync(List<YieldRecordDto> records, int lactationNumber)
+    public async Task<List<IntervalYieldDto>> GetAdjustedProteinYields(List<YieldRecordDto> records, int lactationNumber)
     {
         bool isFirstLactation = lactationNumber == 1;
-
-        List<IntervalYield> intervals = await GetAdjustedYields(YieldTrait.Protein, records, isFirstLactation);
-        double total = intervals.Sum(x => (x.End - x.Start) * x.Yield);
-
-        return (int)Math.Round(total, MidpointRounding.AwayFromZero);
+        return await GetAdjustedYields(YieldTrait.Protein, records, isFirstLactation);
     }
 
-    public async Task<int> GetMilkTotalYieldStandardizedAsync(List<YieldRecordDto> records, int lactationNumber)
+    public async Task<List<IntervalYieldDto>> GetAdjustedMilkYield305Days(List<YieldRecordDto> records, int lactationNumber)
     {
         bool isFirstLactation = lactationNumber == 1;
-
-        List<IntervalYield> intervals = await GetAdjustedYieldsFor305Days(YieldTrait.Milk, records, isFirstLactation);
-        double total = intervals.Sum(x => (x.End - x.Start) * x.Yield);
-
-        return (int)Math.Round(total, MidpointRounding.AwayFromZero);
+        return await GetAdjustedYieldsFor305Days(YieldTrait.Milk, records, isFirstLactation);
     }
 
-    public async Task<int> GetFatTotalYieldStandardizedAsync(List<YieldRecordDto> records, int lactationNumber)
+    public async Task<List<IntervalYieldDto>> GetAdjustedFatYield305Days(List<YieldRecordDto> records, int lactationNumber)
     {
         bool isFirstLactation = lactationNumber == 1;
-
-        List<IntervalYield> intervals = await GetAdjustedYieldsFor305Days(YieldTrait.Fat, records, isFirstLactation);
-        double total = intervals.Sum(x => (x.End - x.Start) * x.Yield);
-
-        return (int)Math.Round(total, MidpointRounding.AwayFromZero);
+        return await GetAdjustedYieldsFor305Days(YieldTrait.Fat, records, isFirstLactation);
     }
 
-    public async Task<int> GetProteinTotalYieldStandardizedAsync(List<YieldRecordDto> records, int lactationNumber)
+    public async Task<List<IntervalYieldDto>> GetAdjustedProteinYield305Days(List<YieldRecordDto> records, int lactationNumber)
     {
         bool isFirstLactation = lactationNumber == 1;
-
-        List<IntervalYield> intervals = await GetAdjustedYieldsFor305Days(YieldTrait.Protein, records, isFirstLactation);
-        double total = intervals.Sum(x => (x.End - x.Start) * x.Yield);
-
-        return (int)Math.Round(total, MidpointRounding.AwayFromZero);
+        return await GetAdjustedYieldsFor305Days(YieldTrait.Protein, records, isFirstLactation);
     }
 
     //public async Task<TotalDto> GetTotalYield(
@@ -143,14 +123,14 @@ public class LactationService : ILactationService
     //    return (int)Math.Round(total, MidpointRounding.AwayFromZero);
     //}
 
-    private async Task<List<YieldRecordDto>> GetAdjustedYields(YieldTrait yieldTrait, List<YieldRecordDto> yields, bool isFirstLactation)
+    private async Task<List<IntervalYieldDto>> GetAdjustedYields(YieldTrait yieldTrait, List<YieldRecordDto> yields, bool isFirstLactation)
     {
         yields = yields
             .Where(x => x.DaysInMilk >= 6) // ignore test-day samples on the first 5 days after calving
             .OrderBy(x => x.DaysInMilk)
             .ToList();
 
-        List<YieldRecordDto> intervalYields = new();
+        List<IntervalYieldDto> adjustedYields = new();
 
         for (int i = 0; i < yields.Count; i++)
         {
@@ -188,21 +168,25 @@ public class LactationService : ILactationService
                 yield = (previousItemYield + currentItemYield) / 2;
             }
 
-            YieldRecordDto currentInterval = new(currentItemDim, yield);
-            intervalYields.Add(currentInterval);
+            IntervalYieldDto currentInterval = new(previousItemDim, currentItemDim, yield);
+            adjustedYields.Add(currentInterval);
         }
 
-        return intervalYields;
+        return adjustedYields;
     }
 
-    private async Task<List<YieldRecordDto>> GetAdjustedYieldsFor305Days(YieldTrait yieldTrait, List<YieldRecordDto> yields, bool isFirstLactation)
+    /// <summary>
+    /// posso usar este método para calcular média de leite por dia, teor butiroso e teor proteico
+    /// no caso da gordura a proteína vou ter de usar ainda outro método que multiplique o teor ajustado pela produção no intervalo
+    /// </summary>
+    private async Task<List<IntervalYieldDto>> GetAdjustedYieldsFor305Days(YieldTrait yieldTrait, List<YieldRecordDto> yields, bool isFirstLactation)
     {
         yields = yields
             .Where(x => x.DaysInMilk >= 6) // ignore test-day samples on the first 5 days after calving
             .OrderBy(x => x.DaysInMilk)
             .ToList();
 
-        List<YieldRecordDto> intervalYields = new();
+        List<IntervalYieldDto> adjustedYields = new();
 
         for (int i = 0; i < yields.Count; i++)
         {
@@ -247,25 +231,28 @@ public class LactationService : ILactationService
                 yield = (previousItemYield + currentItemYield) / 2;
             }
 
-            YieldRecordDto currentInterval = new(currentItemDim > 305 ? 305 : currentItemDim, yield);
-            intervalYields.Add(currentInterval);
+            IntervalYieldDto currentInterval = new(previousItemDim, currentItemDim > 305 ? 305 : currentItemDim, yield);
+            adjustedYields.Add(currentInterval);
 
             // stop iterating on the first test-day sample at or after 305 days
             if (currentItemDim >= 305)
                 break;
 
+            //TODO: this is not correct!
             // predict remaining yield when the lactation is shorter than 305 days
             if (lastItem && currentItemDim < 305)
             {
                 double factor = await GetFactorForTestIntervalAfterLastSampleDay(
                     yieldTrait, currentItemDim, 305 - currentItemDim, isFirstLactation);
+
                 yield = factor * currentItemYield;
-                YieldRecordDto lastInterval = new(305, yield);
-                intervalYields.Add(lastInterval);
+
+                IntervalYieldDto lastInterval = new(currentItemDim, 305, yield);
+                adjustedYields.Add(lastInterval);
             }
         }
 
-        return intervalYields;
+        return adjustedYields;
     }
 
     private async Task<double> GetFactorForFirstTestInterval(YieldTrait yieldTrait, int daysInMilk, bool isFirstLactation)
@@ -299,17 +286,9 @@ public class LactationService : ILactationService
     private async Task<double> GetFactorForTestIntervalAfterLastSampleDay(
         YieldTrait yieldTrait, int daysInMilk, int daysInTestInterval, bool isFirstLactation)
     {
-        if (yieldTrait == YieldTrait.Milk)
-            return await _yieldFactorRepository.GetMilkFactorForTestIntervalAfterLastSampleDayAsync(
-                daysInMilk, daysInTestInterval, isFirstLactation);
-        else if (yieldTrait == YieldTrait.Fat)
-            return await _yieldFactorRepository.GetFatFactorForTestIntervalAfterLastSampleDayAsync(
-                daysInMilk, daysInTestInterval, isFirstLactation);
-        else if (yieldTrait == YieldTrait.Protein)
-            return await _yieldFactorRepository.GetProteinFactorForTestIntervalAfterLastSampleDayAsync(
-                daysInMilk, daysInTestInterval, isFirstLactation);
+        var teste = new MilkFactorForFirstLactation();
 
-        return 1;
+        return teste.CalculateFactorForTestIntervalAfterLastSampleDay(daysInMilk, daysInTestInterval);
     }
 
     private enum YieldTrait
@@ -317,6 +296,62 @@ public class LactationService : ILactationService
         Milk = 1,
         Fat = 2,
         Protein = 3
+    }
+
+    
+    private class TraitFactor
+    {
+        private readonly double _slope;
+        private readonly double _intercept;
+
+        protected TraitFactor(double slope, double intercept)
+        {
+            _slope = slope;
+            _intercept = intercept;
+        }
+
+        public double CalculateFactorForFirstTestInterval(int daysInMilk)
+        {
+            return 0;
+        }
+
+        public double CalculateFactorForTestIntervalAtPeakOfLactation(int daysInMilk, int daysInTestInterval)
+        {
+            return 0;
+        }
+
+        public double CalculateFactorForTestIntervalAfterLastSampleDay(int daysInMilk, int daysInTestInterval)
+        {
+            return 1 - 0.5 * _slope * daysInTestInterval / (_intercept - _slope * daysInMilk);
+        }
+    }
+
+    private class MilkFactorForFirstLactation : TraitFactor
+    {
+        const double intercept = 48.3;
+        const double slope = 0.071;
+        public MilkFactorForFirstLactation() : base(intercept, slope) { }
+    }
+
+    private class MilkFactorForOtherLactation : TraitFactor
+    {
+        const double intercept = 71;
+        const double slope = 0.144;
+        public MilkFactorForOtherLactation() : base(intercept, slope) { }
+    }
+
+    private class FatFactorForFirstLactation : TraitFactor
+    {
+        const double intercept = 2.03;
+        const double slope = 0.0025;
+        public FatFactorForFirstLactation() : base(intercept, slope) { }
+    }
+
+    private class FatFactorForOtherLactation : TraitFactor
+    {
+        const double intercept = 2.78;
+        const double slope = 0.0052;
+        public FatFactorForOtherLactation() : base(intercept, slope) { }
     }
 }
 
