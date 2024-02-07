@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Production.API.DTOs;
 using Production.API.Infrastructure.Repositories;
 using Production.API.Models;
-using Production.API.Services;
 using System.ComponentModel.DataAnnotations;
 
 namespace Production.API.Controllers;
@@ -14,19 +13,16 @@ public class TestSampleController : ControllerBase
 {
     private readonly ITestSampleRepository _testSampleRepository;
     private readonly ILactationRepository _lactationRepository;
-    private readonly ILactationService _lactationService;
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
 
     public TestSampleController(
         ITestSampleRepository testSampleRepository,
         ILactationRepository lactationRepository,
-        ILactationService lactationService,
         ILogger logger, IMapper mapper)
     {
         _testSampleRepository = testSampleRepository;
         _lactationRepository = lactationRepository;
-        _lactationService = lactationService;
         _logger = logger;
         _mapper = mapper;
     }
@@ -262,7 +258,7 @@ public class TestSampleController : ControllerBase
     }
 
     [HttpGet("Chart")]
-    public async Task<ActionResult<TestSamplesForChartVm>> GetTestSamplesForChart(
+    public Task<ActionResult<TestSamplesForChartVm>> GetTestSamplesForChart(
         [FromQuery] int animalId,
         [FromQuery] int lactationId)
     {
@@ -270,114 +266,11 @@ public class TestSampleController : ControllerBase
     }
 
     [HttpGet("Total")]
-    public async Task<ActionResult<IEnumerable<TotalsForTableVm>>> GetMilkTotalsForTable(
+    public Task<ActionResult<IEnumerable<TotalsForTableVm>>> GetMilkTotalsForTable(
         [FromQuery] int animalId,
         [FromQuery] int lactationId)
     {
-        _logger.LogInformation(
-            "Begin call to {MethodName} for animal id {AnimalId} and lactation id {LactationId}",
-            nameof(GetMilkTotalsForTable), animalId, lactationId);
-
-        Lactation? lactation = await GetLactationById(lactationId);
-        if (lactation == null)
-        {
-            _logger.LogInformation("Lactation with id {id} was not found.", lactationId);
-            return Ok(new List<TotalsForTableVm>());
-        }
-
-        // get the test-day samples for the given animal and lactation
-        IEnumerable<TestSample> testDaySamples = await _testSampleRepository.GetSortedTestSamplesForPeriodAsync(animalId, lactation.CalvingDate, lactation.EndDate);
-
-        // transform test-day samples into records expected by lactation service
-        List<YieldRecordDto> milkSamples = testDaySamples
-            .Select(x => new YieldRecordDto(x.Date.DayNumber - lactation.CalvingDate.DayNumber, x.MilkYield))
-            .ToList();
-
-        // feed records into lactation service and get milk yields per interval
-        List<IntervalYieldDto> milkYields = await _lactationService.GetAdjustedMilkYields(milkSamples, lactation.Number);
-
-        #region MaybeRemove
-        // join milk yield to its sample (to use for solid yield calculations)
-        var interm = testDaySamples
-            .Zip(milkSamples, (x,y) =>
-                new
-                {
-                    x.Date,
-                    x.FatPercentage,
-                    x.ProteinPercentage,
-                    IntervalYield = y.Yield
-                })
-            .ToList();
-
-        // transform test-day samples with milk yields into records with fat and protein yields
-        List<YieldRecordDto> fatSamples = new List<YieldRecordDto>();
-        List<YieldRecordDto> proteinSamples = new List<YieldRecordDto>();
-
-        double milkYieldForFat = 0;
-        double milkYieldForProtein = 0;
-
-        foreach (var item in interm)
-        {
-            double milkYield = item.IntervalYield;
-            milkYieldForFat += milkYield;
-            milkYieldForProtein += milkYield;
-
-            int daysInMilk = item.Date.DayNumber - lactation.CalvingDate.DayNumber;
-
-            if (item.FatPercentage != null)
-            {
-                fatSamples.Add(new YieldRecordDto(
-                    daysInMilk,
-                    milkYieldForFat * item.FatPercentage.Value / 100
-                ));
-            }
-
-            if (item.ProteinPercentage != null)
-            {
-                proteinSamples.Add(new YieldRecordDto(
-                    daysInMilk,
-                    milkYieldForProtein * item.ProteinPercentage.Value / 100
-                ));
-            }
-        }
-        #endregion
-
-        // feed fat records into lactation service and get fat yields per interval
-        List<IntervalYieldDto> fatYields = await _lactationService.GetAdjustedFatYields(fatSamples, lactation.Number);
-
-        // feed protein records into lactation service and get protein yields per interval
-        List<IntervalYieldDto> proteinYields = await _lactationService.GetAdjustedProteinYields(proteinSamples, lactation.Number);
-
-        // calculate total yield during the lactation
-        int milkTotal = (int)Math.Round(
-            milkYields.Sum(x => (x.DaysInMilkAtEnd - x.DaysInMilkAtStart) * x.Yield),
-            MidpointRounding.AwayFromZero);
-        int fatTotal = (int)Math.Round(
-            fatYields.Sum(x => (x.DaysInMilkAtEnd - x.DaysInMilkAtStart) * x.Yield),
-            MidpointRounding.AwayFromZero);
-        int proteinTotal = (int)Math.Round(
-            proteinYields.Sum(x => (x.DaysInMilkAtEnd - x.DaysInMilkAtStart) * x.Yield),
-            MidpointRounding.AwayFromZero);
-
-        var actualTotals = new List<TotalDto>() {
-            new TotalDto(
-                MilkYield: milkTotal,
-                FatYield: fatTotal,
-                ProteinYield: proteinTotal)};
-
-        var adjustedTotals = new List<TotalDto>() {
-            new TotalDto(
-                MilkYield: adjustedYields.Item1,
-                FatYield: adjustedYields.Item2,
-                ProteinYield: adjustedYields.Item3)};
-
-        var listToReturn = new List<TotalsForTableVm>()
-        {
-            new TotalsForTableVm(Order: 1, Name: "Actual production", Totals: actualTotals),
-            new TotalsForTableVm(Order: 2, Name: "Adjusted to 305 days", Totals: adjustedTotals)
-        };
-
-        return Ok(listToReturn);
+        throw new NotImplementedException();
     }
 
     private async Task<Lactation?> GetLactationByDate(int animalId, DateOnly date)
@@ -421,11 +314,3 @@ public class TestSampleController : ControllerBase
         return nextLactation.CalvingDate;
     }
 }
-
-//  get all measurements and calving date for a given animal and lactation: GET recordings
-//  insert one measurement: POST recordings
-//  update one measurement: PUT recordings/1
-//  delete one measurement: DELETE recordings/1
-//get all measurements and all predictions and calving date for a given animal and lactation: GET recordings/chart
-//get measurement total and prediction total for a given animal and lactation: GET recordings/total
- 

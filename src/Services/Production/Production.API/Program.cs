@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Production.API.Infrastructure;
 using Production.API.Infrastructure.Repositories;
-using Production.API.Services;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,9 +20,6 @@ builder.Services.AddDbContext<ProductionContext>(options =>
 
 builder.Services.AddScoped<ILactationRepository, LactationRepository>();
 builder.Services.AddScoped<ITestSampleRepository, TestSampleRepository>();
-builder.Services.AddScoped<IYieldFactorRepository, YieldFactorRepository>();
-
-builder.Services.AddScoped<ILactationService, LactationService>();
 
 var app = builder.Build();
 
@@ -38,7 +34,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
-DbInitializer.ImportFactors(app);
 
 app.Run();
