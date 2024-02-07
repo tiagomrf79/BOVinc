@@ -9,7 +9,7 @@ public class ProductionContext : DbContext
     public DbSet<Lactation> Lactations { get; set; }
     public DbSet<TestSample> TestSamples { get; set; }
 
-    public DbSet<YieldFactors> FirstTestFactors { get; set; }
+    public DbSet<FirstTestFactor> FirstTestFactors { get; set; }
     public DbSet<PeakTestFactor> PeakTestFactors { get; set; }
     public DbSet<LastTestFactor> LastTestFactors { get; set; }
 

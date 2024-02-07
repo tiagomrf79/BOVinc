@@ -320,9 +320,12 @@ public class LactationService : ILactationService
             return 0;
         }
 
-        public double CalculateFactorForTestIntervalAfterLastSampleDay(int daysInMilk, int daysInTestInterval)
+        public async Task<double> CalculateFactorForTestIntervalAfterLastSampleDay(int daysInMilk, int daysInTestInterval)
         {
-            return 1 - 0.5 * _slope * daysInTestInterval / (_intercept - _slope * daysInMilk);
+            return await _yieldFactorRepository.GetMilkFactorForTestIntervalAtPeakOfLactationAsync(
+                daysInMilk, daysInTestInterval, isFirstLactation);
+
+            //return 1 - 0.5 * _slope * daysInTestInterval / (_intercept - _slope * daysInMilk);
         }
     }
 
