@@ -120,9 +120,8 @@ public class TestSampleController : ControllerBase
             return BadRequest(problemDetails);
         }
 
-        var recordToUpdate = await _testSampleRepository.GetTestSampleByIdAsync((int)dataReceived.Id);
-
         // Check if record exists
+        var recordToUpdate = await _testSampleRepository.GetTestSampleByIdAsync(dataReceived.Id.Value);
         if (recordToUpdate == null)
         {
             ProblemDetails problemDetails = new()

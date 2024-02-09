@@ -6,7 +6,10 @@ public class Lactation
     public int LactationNumber { get; set; } //TODO: change to calculated value
     public DateOnly Calvingate { get; set; }
     public DateOnly? EndDate { get; set; }
-    public Animal Animal { get; set; }
+    public FarmAnimal FarmAnimal { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime LastUpdatedAt { get; set; }
+
 
     public Lactation()
     {

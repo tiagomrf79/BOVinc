@@ -2,15 +2,15 @@
 
 namespace Animal.API.Models;
 
-public class Animal
+public class FarmAnimal
 {
     public int Id { get; set; }
     public string? RegistrationId { get; set; }
     public string? Name { get; set; }
     
     public DateOnly? DateOfBirth { get; set; }
-    public Animal? Dam {  get; set; }
-    public Animal? Sire {  get; set; }
+    public FarmAnimal? Dam {  get; set; }
+    public FarmAnimal? Sire {  get; set; }
 
     public required Sex Sex { get; set; }
     public required Breed Breed { get; set; }
@@ -22,4 +22,7 @@ public class Animal
     public required Catalog Catalog { get; set; }
 
     public string? Notes { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+    public DateTime LastUpdatedAt { get; set; }
 }

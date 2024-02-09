@@ -3,7 +3,7 @@
 public class Lactation
 {
     public int Id { get; set; }
-    public int Number {  get; set; }
+    public int LactationNumber {  get; set; }
     public DateOnly CalvingDate { get; set; }
     public DateOnly? EndDate { get; set; }
     public int AnimalId { get; set; }
