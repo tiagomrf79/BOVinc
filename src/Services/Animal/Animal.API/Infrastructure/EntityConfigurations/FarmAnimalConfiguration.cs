@@ -13,6 +13,10 @@ public class FarmAnimalConfiguration : IEntityTypeConfiguration<FarmAnimal>
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).IsRequired();
 
+        builder.Property(x => x.RegistrationId).HasMaxLength(50);
+
+        builder.Property(x => x.Name).HasMaxLength(50);
+
         builder.HasOne(x => x.Dam).WithMany().HasForeignKey(x => x.Dam);
 
         builder.HasOne(x => x.Sire).WithMany().HasForeignKey(x => x.Sire);
@@ -31,5 +35,10 @@ public class FarmAnimalConfiguration : IEntityTypeConfiguration<FarmAnimal>
 
         builder.HasOne(x => x.Catalog).WithMany().HasForeignKey(x => x.Catalog);
         builder.Property(x => x.Catalog).IsRequired();
+
+        builder.Property(x => x.Notes).HasMaxLength(250);
+
+        builder.Property(x => x.CreatedAt).IsRequired();
+        builder.Property(x => x.LastUpdatedAt).IsRequired();
     }
 }

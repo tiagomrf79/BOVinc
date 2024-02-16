@@ -1,8 +1,8 @@
-﻿using Animal.API.Enums;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Occurrence.API.Enums;
 
-namespace Animal.API.Infrastructure.EntityConfigurations;
+namespace Occurrence.API.Infrastructure.EntityConfigurations;
 
 public class EnumerationConfiguration<T> : IEntityTypeConfiguration<T> where T : Enumeration
 {

@@ -19,7 +19,7 @@ public class CatalogController : ControllerBase
     {
         _logger.LogInformation("Begin call to {MethodName}", nameof(GetCatalogs));
 
-        var listToReturn = Enumeration.GetAll<Catalog>();
+        var listToReturn = Catalog.List();
         
         return Ok(listToReturn);
     }
