@@ -17,8 +17,7 @@ public class LactationConfiguration : IEntityTypeConfiguration<Lactation>
 
         builder.Property(x => x.CalvingDate).IsRequired();
 
-        builder.HasOne(x => x.FarmAnimal).WithOne();
-        builder.Property(x => x.FarmAnimal).IsRequired();
+        builder.HasOne(x => x.FarmAnimal).WithMany().HasForeignKey(x => x.FarmAnimalId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(x => x.CreatedAt).IsRequired();
         builder.Property(x => x.LastUpdatedAt).IsRequired();

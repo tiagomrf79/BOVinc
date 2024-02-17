@@ -14,16 +14,16 @@ namespace Animal.API.Controllers;
 [ApiController]
 public class AnimalController : ControllerBase
 {
-    private readonly AnimalRepository _animalRepository;
+    private readonly IAnimalRepository _animalRepository;
     private readonly ILactationRepository _lactationRepository;
-    private readonly AnimalStatusRepository _animalStatusRepository;
+    private readonly IAnimalStatusRepository _animalStatusRepository;
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
 
     public AnimalController(
-        AnimalRepository animalRepository,
+        IAnimalRepository animalRepository,
         ILactationRepository lactationRepository,
-        AnimalStatusRepository animalStatusRepository,
+        IAnimalStatusRepository animalStatusRepository,
         ILogger logger,
         IMapper mapper)
     {
@@ -139,7 +139,7 @@ public class AnimalController : ControllerBase
         }
 
         int lastLactationNumber = 0;
-        if (searchResult.Sex == Sex.Female)
+        if (Enumeration.FromValue<Sex>(searchResult.SexId) == Sex.Female)
         {
             IEnumerable<Lactation> lactations = await _lactationRepository.GetLactationsAsync(id);
             lastLactationNumber = lactations.Last().LactationNumber;
@@ -257,7 +257,7 @@ public class AnimalController : ControllerBase
             .Select(x => new DescendantDto(
                 x.Id,
                 CreateLabelForAnimal(x),
-                x.Sex.Id,
+                x.SexId,
                 x.IsActive,
                 x.Dam != null ? CreateLabelForAnimal(x.Dam) : String.Empty,
                 x.Sire != null ? CreateLabelForAnimal(x.Sire) : String.Empty
@@ -359,7 +359,7 @@ public class AnimalController : ControllerBase
         }
 
         int lastLactationNumber = 0;
-        if (animal.Sex == Sex.Female)
+        if (Enumeration.FromValue<Sex>(animal.SexId) == Sex.Female)
         {
             IEnumerable<Lactation> lactations = await _lactationRepository.GetLactationsAsync(id);
             lastLactationNumber = lactations.Last().LactationNumber;
@@ -500,7 +500,7 @@ public class AnimalController : ControllerBase
     private AscendantDto CreateAscendantFromAnimal(FarmAnimal animal, int level = 0)
     {
         string animalLabel = CreateLabelForAnimal(animal);
-        int sexId = animal.Sex.Id;
+        int sexId = animal.SexId;
         IEnumerable<AscendantDto> parents = Enumerable.Empty<AscendantDto>();
 
         if (level <= 2)

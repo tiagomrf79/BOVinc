@@ -8,6 +8,7 @@ public class Lactation : IValidatableObject
     public int LactationNumber { get; set; } //TODO: change to calculated value
     public DateOnly CalvingDate { get; set; } //Should I associate a calving event instead?
     public DateOnly? EndDate { get; set; } //Should I associate a end event instead?
+    public int? FarmAnimalId { get; set; }
     public FarmAnimal? FarmAnimal { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime LastUpdatedAt { get; set; }

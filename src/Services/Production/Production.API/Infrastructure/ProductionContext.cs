@@ -9,7 +9,7 @@ public class ProductionContext : DbContext
     public DbSet<Lactation> Lactations { get; set; }
     public DbSet<TestSample> TestSamples { get; set; }
 
-    public ProductionContext(DbContextOptions<ProductionContext> options) : base()
+    public ProductionContext(DbContextOptions<ProductionContext> options) : base(options)
     {
     }
 

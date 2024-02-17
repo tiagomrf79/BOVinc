@@ -6,7 +6,7 @@ using System.Linq.Dynamic.Core;
 
 namespace Animal.API.Infrastructure.Repositories;
 
-public class AnimalRepository
+public class AnimalRepository : IAnimalRepository
 {
     private readonly AnimalContext _context;
 
@@ -53,7 +53,7 @@ public class AnimalRepository
         if (parent.Sex == Sex.Male)
             query = query.Where(x => x.Sire == parent);
         else if (parent.Sex == Sex.Female)
-            query = query.Where (x => x.Dam == parent);
+            query = query.Where(x => x.Dam == parent);
 
         list = await query.OrderByDescending(x => x.DateOfBirth).ToListAsync();
 

@@ -10,7 +10,7 @@ public class OccurrenceContext : DbContext
     public DbSet<Group> Groups { get; set; }
     public DbSet<Event> Events { get; set; }
 
-    public OccurrenceContext(DbContextOptions<OccurrenceContext> options) : base()
+    public OccurrenceContext(DbContextOptions<OccurrenceContext> options) : base(options)
     { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

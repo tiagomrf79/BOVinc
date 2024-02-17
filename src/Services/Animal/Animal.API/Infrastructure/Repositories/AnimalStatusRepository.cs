@@ -2,7 +2,7 @@
 
 namespace Animal.API.Infrastructure.Repositories;
 
-public class AnimalStatusRepository
+public class AnimalStatusRepository : IAnimalStatusRepository
 {
     private readonly AnimalContext _context;
 

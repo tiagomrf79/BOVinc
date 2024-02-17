@@ -5,10 +5,10 @@ namespace Animal.API.Enums;
 public class Purpose : Enumeration
 {
     public static Purpose Breeding = new Purpose(1, nameof(Breeding));
-    public static Purpose Milk = new Purpose(1, nameof(Milk));
-    public static Purpose Meat = new Purpose(1, nameof(Meat));
-    public static Purpose ToCull = new Purpose(1, "To cull");
-    public static Purpose ToSell = new Purpose(1, "To sell");
+    public static Purpose Milk = new Purpose(2, nameof(Milk));
+    public static Purpose Meat = new Purpose(3, nameof(Meat));
+    public static Purpose ToCull = new Purpose(4, "To cull");
+    public static Purpose ToSell = new Purpose(5, "To sell");
 
     public Purpose(int id, string name)
         : base(id, name)

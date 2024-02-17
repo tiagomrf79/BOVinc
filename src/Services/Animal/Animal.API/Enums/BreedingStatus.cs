@@ -5,8 +5,8 @@ namespace Animal.API.Enums;
 public class BreedingStatus : Enumeration
 {
     public static BreedingStatus Open = new BreedingStatus(1, nameof(Open));
-    public static BreedingStatus Bred = new BreedingStatus(1, nameof(Bred));
-    public static BreedingStatus Confirmed = new BreedingStatus(1, nameof(Confirmed));
+    public static BreedingStatus Bred = new BreedingStatus(2, nameof(Bred));
+    public static BreedingStatus Confirmed = new BreedingStatus(3, nameof(Confirmed));
 
     public BreedingStatus(int id, string name)
         : base(id, name)

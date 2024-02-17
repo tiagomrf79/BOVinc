@@ -10,17 +10,24 @@ public class FarmAnimal : IValidatableObject
     public string? Name { get; set; }
     
     public DateOnly? DateOfBirth { get; set; }
+    public int? DamId { get; set; }
     public FarmAnimal? Dam {  get; set; }
+    public int? SireId { get; set; }
     public FarmAnimal? Sire {  get; set; }
 
-    public required Sex Sex { get; set; }
-    public required Breed Breed { get; set; }
+    public required int SexId { get; set; }
+    public Sex Sex {  get; set; }
+    public required int BreedId { get; set; }
+    public Breed Breed { get; set; }
 
+    public int? CategoryId { get; set; }
     public Category? Category { get; set; }
+    public int? PurposeId { get; set; }
     public Purpose? Purpose { get; set; }
 
     public required bool IsActive { get; set; }
-    public required Catalog Catalog { get; set; }
+    public required int CatalogId { get; set; }
+    public Catalog Catalog { get; set; }
 
     public string? Notes { get; set; }
 

@@ -8,7 +8,7 @@ public class EnumerationConfiguration<T> : IEntityTypeConfiguration<T> where T :
 {
     public void Configure(EntityTypeBuilder<T> builder)
     {
-        builder.ToTable(nameof(T));
+        builder.ToTable(typeof(T).Name);
 
         builder.HasKey(x => x.Id);
 
@@ -16,8 +16,10 @@ public class EnumerationConfiguration<T> : IEntityTypeConfiguration<T> where T :
             .IsRequired();
 
         builder.Property(x => x.Name)
-            .HasColumnName(nameof(T))
+            .HasColumnName(typeof(T).Name)
             .HasMaxLength(50)
             .IsRequired();
+
+        builder.HasData(Enumeration.GetAll<T>());
     }
 }
