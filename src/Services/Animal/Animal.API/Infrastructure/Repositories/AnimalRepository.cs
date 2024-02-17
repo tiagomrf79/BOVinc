@@ -1,5 +1,4 @@
-﻿
-using Animal.API.DTOs;
+﻿using Animal.API.DTOs;
 using Animal.API.Enums;
 using Animal.API.Models;
 using Microsoft.EntityFrameworkCore;

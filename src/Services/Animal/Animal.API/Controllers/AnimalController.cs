@@ -5,10 +5,7 @@ using Animal.API.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Services;
-using System.Collections;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Contracts;
 using System.Linq.Dynamic.Core;
 
 namespace Animal.API.Controllers;
@@ -19,13 +16,20 @@ public class AnimalController : ControllerBase
 {
     private readonly AnimalRepository _animalRepository;
     private readonly ILactationRepository _lactationRepository;
+    private readonly AnimalStatusRepository _animalStatusRepository;
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
 
-    public AnimalController(AnimalRepository animalRepository, ILactationRepository lactationRepository, ILogger logger, IMapper mapper)
+    public AnimalController(
+        AnimalRepository animalRepository,
+        ILactationRepository lactationRepository,
+        AnimalStatusRepository animalStatusRepository,
+        ILogger logger,
+        IMapper mapper)
     {
         _animalRepository = animalRepository;
         _lactationRepository = lactationRepository;
+        _animalStatusRepository = animalStatusRepository;
         _logger = logger;
         _mapper = mapper;
     }
@@ -330,6 +334,66 @@ public class AnimalController : ControllerBase
         _logger.LogInformation("Returning {count} sires.", listToReturn.Count);
 
         return Ok(listToReturn);
+    }
+
+    [HttpGet("status/{id:int}")]
+    public async Task<ActionResult<AnimalStatusDto>> GetAnimalStatus(int id)
+    {
+        _logger.LogInformation(
+            "Begin call to {MethodName} for getting status for animal {id}",
+            nameof(GetAnimalStatus), id);
+
+        //check if animal exists
+        FarmAnimal? animal = await _animalRepository.GetAnimalByIdAsync(id);
+        if (animal == null)
+        {
+            ProblemDetails problemDetails = new()
+            {
+                Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
+                Title = "Record not found.",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"The animal with id {id} does not exist."
+            };
+
+            return NotFound(problemDetails);
+        }
+
+        int lastLactationNumber = 0;
+        if (animal.Sex == Sex.Female)
+        {
+            IEnumerable<Lactation> lactations = await _lactationRepository.GetLactationsAsync(id);
+            lastLactationNumber = lactations.Last().LactationNumber;
+        }
+
+        AnimalStatus? animalStatus = await _animalStatusRepository.GetAnimalStatusById(id);
+        if (animalStatus == null)
+            animalStatus = new AnimalStatus() { Animal = animal };
+
+        var dtoToReturn = new AnimalStatusDto(
+            animal.Id,
+            animal.IsActive,
+            animal.DateOfBirth,
+            animalStatus.CurrentGroupName,
+            animalStatus.DateLeftHerd,
+            animalStatus.ReasonLeftHerd,
+            lastLactationNumber,
+            animalStatus.MilkingStatus != null ? animalStatus.MilkingStatus.Id : null,
+            animalStatus.MilkingStatus != null ? animalStatus.MilkingStatus.Name : null,
+            animalStatus.LastCalvingDate,
+            animalStatus.SheduledDryDate,
+            animalStatus.LastDryDate,
+            animalStatus.BreedingStatus != null ? animalStatus.BreedingStatus.Id : null,
+            animalStatus.BreedingStatus != null ? animalStatus.BreedingStatus.Name : null,
+            animalStatus.LastHeatDate,
+            animalStatus.ExpectedHeatDate,
+            animalStatus.LastBreedingDate,
+            animalStatus.LastBreedingBull,
+            animalStatus.DueDateForCalving
+        );
+
+        return Ok(dtoToReturn);
+
+
     }
 
     private async Task<TableResponseDto<T>> CreateResponseDto<T>(IQueryable<T> query, AnimalQueryDto<T> searchQuery)
