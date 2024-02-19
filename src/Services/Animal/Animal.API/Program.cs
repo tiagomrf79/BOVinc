@@ -2,6 +2,9 @@ using Animal.API.Infrastructure;
 using Animal.API.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Enrichers.Span;
+using Serilog.Formatting.Json;
 using System.Reflection;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,6 +12,25 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+builder.Host
+    // Direct all log messages to Serilog
+    .UseSerilog((context, configuration) =>
+    {
+        configuration.ReadFrom.Configuration(context.Configuration);
+        // Include the context in each log context
+        configuration.Enrich.FromLogContext();
+        // Enrich all logs with trace information
+        configuration.Enrich.WithSpan();
+        // Output log messages to the console
+        if (context.HostingEnvironment.IsDevelopment())
+            configuration.WriteTo.Console(
+                // Include the trace Id in the development log output
+                outputTemplate: @"{Timestamp:yyyy-MM-dd HH:mm:ss} {TraceId} {Level:u3} {Message}{NewLine}{Exception}");
+        else
+            configuration.WriteTo.Console(
+                new JsonFormatter());
+    });
 
 builder.Services.AddControllers((options) =>
 {
@@ -67,5 +89,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseSerilogRequestLogging();
 
 app.Run();

@@ -17,14 +17,14 @@ public class AnimalController : ControllerBase
     private readonly IAnimalRepository _animalRepository;
     private readonly ILactationRepository _lactationRepository;
     private readonly IAnimalStatusRepository _animalStatusRepository;
-    private readonly ILogger _logger;
+    private readonly ILogger<FarmAnimal> _logger;
     private readonly IMapper _mapper;
 
     public AnimalController(
         IAnimalRepository animalRepository,
         ILactationRepository lactationRepository,
         IAnimalStatusRepository animalStatusRepository,
-        ILogger logger,
+        ILogger<FarmAnimal> logger,
         IMapper mapper)
     {
         _animalRepository = animalRepository;

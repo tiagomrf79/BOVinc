@@ -7,9 +7,9 @@ namespace Animal.API.Controllers;
 [ApiController]
 public class SexController : ControllerBase
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<Sex> _logger;
 
-    public SexController(ILogger logger)
+    public SexController(ILogger<Sex> logger)
     {
         _logger = logger;
     }

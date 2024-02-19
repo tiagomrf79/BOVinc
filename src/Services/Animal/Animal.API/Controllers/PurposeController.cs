@@ -7,9 +7,9 @@ namespace Animal.API.Controllers;
 [ApiController]
 public class PurposeController : ControllerBase
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<Purpose> _logger;
 
-    public PurposeController(ILogger logger)
+    public PurposeController(ILogger<Purpose> logger)
     {
         _logger = logger;
     }

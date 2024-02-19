@@ -7,9 +7,9 @@ namespace Animal.API.Controllers;
 [ApiController]
 public class CategoryController : ControllerBase
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<Category> _logger;
 
-    public CategoryController(ILogger logger)
+    public CategoryController(ILogger<Category> logger)
     {
         _logger = logger;
     }

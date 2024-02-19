@@ -4,6 +4,7 @@ namespace Animal.API.Models;
 
 public class AnimalStatus
 {
+    public int Id { get; set; }
     public int AnimalId { get; set; }
     public FarmAnimal Animal { get; set; }
     public string? CurrentGroupName { get; set; }
@@ -23,4 +24,7 @@ public class AnimalStatus
     public DateOnly? LastBreedingDate { get; set; }
     public string? LastBreedingBull { get; set; }
     public DateOnly? DueDateForCalving {  get; set; }
+
+    public DateTime CreatedAt { get; set; }
+    public DateTime LastUpdatedAt { get; set; }
 }

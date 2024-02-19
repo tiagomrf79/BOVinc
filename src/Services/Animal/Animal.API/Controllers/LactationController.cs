@@ -11,10 +11,10 @@ namespace Animal.API.Controllers;
 public class LactationController : ControllerBase
 {
     private readonly ILactationRepository _lactationRepository;
-    private readonly ILogger _logger;
+    private readonly ILogger<Lactation> _logger;
     private readonly IMapper _mapper;
 
-    public LactationController(ILactationRepository lactationRepository, ILogger logger, IMapper mapper)
+    public LactationController(ILactationRepository lactationRepository, ILogger<Lactation> logger, IMapper mapper)
     {
         _lactationRepository = lactationRepository;
         _logger = logger;

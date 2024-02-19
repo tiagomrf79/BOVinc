@@ -1,5 +1,4 @@
-﻿using Animal.API.Enums;
-using Animal.API.Models;
+﻿using Animal.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Animal.API.Infrastructure;
@@ -36,7 +35,11 @@ public class AnimalContextSeed
                     LastUpdatedAt = DateTime.UtcNow
                 });
 
+            animalContext.Database.BeginTransaction();
+            animalContext.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Breed ON;");
             await animalContext.SaveChangesAsync();
+            animalContext.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Breed OFF;");
+            animalContext.Database.CommitTransaction();
         }
 
         if (!await animalContext.FarmAnimals.AnyAsync())
@@ -44,16 +47,36 @@ public class AnimalContextSeed
             await animalContext.FarmAnimals.AddRangeAsync(
                 new FarmAnimal()
                 {
+                    Id = 59,
+                    Name = "Xepa",
+                    SexId = 1,
+                    BreedId = 1,
+                    IsActive = false,
+                    CatalogId = 2
+                },
+                new FarmAnimal()
+                {
+                    Id = 97,
+                    Name = "Mimosa",
+                    SexId = 1,
+                    BreedId = 1,
+                    IsActive = false,
+                    CatalogId = 2
+                },
+                new FarmAnimal()
+                {
                     Id = 1,
                     RegistrationId = "PT 219 144848",
                     Name = "Marquesa",
                     DateOfBirth = new DateOnly(2016,8,28),
+                    DamId = 59,
                     SexId = 1,
                     BreedId = 1,
                     CategoryId = 3,
                     PurposeId = 2,
                     IsActive = true,
                     CatalogId = 1,
+                    Notes = "Best cow ever",
                     CreatedAt = DateTime.UtcNow,
                     LastUpdatedAt = DateTime.UtcNow
                 },
@@ -236,7 +259,116 @@ public class AnimalContextSeed
                     CategoryId = 5,
                     PurposeId = 1,
                     IsActive = true,
-                    CatalogId = 1,
+                    CatalogId = 3,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                });
+
+            animalContext.Database.BeginTransaction();
+            animalContext.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Animal ON;");
+            await animalContext.SaveChangesAsync();
+            animalContext.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Animal OFF;");
+            animalContext.Database.CommitTransaction();
+        }
+
+        if (!await animalContext.AnimalStatus.AnyAsync())
+        {
+            await animalContext.AnimalStatus.AddRangeAsync(
+                new AnimalStatus()
+                {
+                    AnimalId = 1,
+                    CurrentGroupName = "Main barn",
+                    LastCalvingDate = new DateOnly(2023, 12, 26),
+                    MilkingStatusId = 1,
+                    BreedingStatusId = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new AnimalStatus()
+                {
+                    AnimalId = 2,
+                    CurrentGroupName = "Maternity pen",
+                    MilkingStatusId = 2,
+                    LastBreedingBull = "Malhão",
+                    LastDryDate = new DateOnly(2023, 11, 11),
+                    DueDateForCalving = new DateOnly(2024, 1, 11),
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new AnimalStatus()
+                {
+                    AnimalId = 3,
+                    LastCalvingDate = new DateOnly(2023, 3, 17),
+                    MilkingStatusId = 1,
+                    BreedingStatusId = 3,
+                    LastBreedingDate = new DateOnly(2023, 5, 31),
+                    DueDateForCalving = new DateOnly(2024, 3, 14),
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+
+                },
+                new AnimalStatus()
+                {
+                    AnimalId = 4,
+                    LastCalvingDate = new DateOnly(2023, 12, 21),
+                    MilkingStatusId = 1,
+                    BreedingStatusId = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new AnimalStatus()
+                {
+                    AnimalId = 5,
+                    LastCalvingDate = new DateOnly(2023, 12, 26),
+                    MilkingStatusId = 1,
+                    BreedingStatusId = 2,
+                    LastBreedingDate = new DateOnly(2023, 12, 17),
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new AnimalStatus()
+                {
+                    AnimalId = 6,
+                    LastCalvingDate = new DateOnly(2023, 4, 1),
+                    MilkingStatusId = 1,
+                    BreedingStatusId = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new AnimalStatus()
+                {
+                    AnimalId = 7,
+                    LastCalvingDate = new DateOnly(2023, 4, 1),
+                    MilkingStatusId = 1,
+                    BreedingStatusId = 3,
+                    LastBreedingDate = new DateOnly(2023, 7, 27),
+                    DueDateForCalving = new DateOnly(2024, 5, 9),
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new AnimalStatus()
+                {
+                    AnimalId = 8,
+                    MilkingStatusId = 2,
+                    LastDryDate = new DateOnly(2023, 11, 11),
+                    DueDateForCalving = new DateOnly(2024, 1, 23),
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new AnimalStatus()
+                {
+                    AnimalId = 9,
+                    BreedingStatusId = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new AnimalStatus()
+                {
+                    AnimalId = 12,
+                    CurrentGroupName = "Late heifers",
+                    BreedingStatusId = 3,
+                    LastBreedingDate = new DateOnly(2023, 6, 19),
+                    DueDateForCalving = new DateOnly(2024, 3, 8),
                     CreatedAt = DateTime.UtcNow,
                     LastUpdatedAt = DateTime.UtcNow
                 });
@@ -244,22 +376,64 @@ public class AnimalContextSeed
             await animalContext.SaveChangesAsync();
         }
 
-        if (!await animalContext.AnimalStatus.AnyAsync())
-        {
-            /*await animalContext.AnimalStatus.AddRangeAsync(
-                new AnimalStatus()
-                {
-                    AnimalId = 9,
-                    bree
-                }
-                );
-
-            await animalContext.SaveChangesAsync();*/
-        }
-
         if (!await animalContext.Lactations.AnyAsync())
         {
+            await animalContext.Lactations.AddRangeAsync(
+                new Lactation()
+                {
+                    Id = 1,
+                    LactationNumber = 3,
+                    CalvingDate = new DateOnly(2023,12,26),
+                    FarmAnimalId = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new Lactation()
+                {
+                    Id = 2,
+                    LactationNumber = 2,
+                    CalvingDate = new DateOnly(2022, 12, 13),
+                    EndDate = new DateOnly(2023,10,24),
+                    FarmAnimalId = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new Lactation()
+                {
+                    Id = 3,
+                    LactationNumber = 1,
+                    CalvingDate = new DateOnly(2021, 12, 8),
+                    EndDate = new DateOnly(2022, 10, 13),
+                    FarmAnimalId = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new Lactation()
+                {
+                    Id = 4,
+                    LactationNumber = 5,
+                    CalvingDate = new DateOnly(2023, 1, 20),
+                    EndDate = new DateOnly(2023, 11, 11),
+                    FarmAnimalId = 2,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                },
+                new Lactation()
+                {
+                    Id = 5,
+                    LactationNumber = 4,
+                    CalvingDate = new DateOnly(2021, 12, 17),
+                    EndDate = new DateOnly(2022, 11, 24),
+                    FarmAnimalId = 2,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow
+                });
 
+            animalContext.Database.BeginTransaction();
+            animalContext.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Lactation ON;");
+            await animalContext.SaveChangesAsync();
+            animalContext.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Lactation OFF;");
+            animalContext.Database.CommitTransaction();
         }
     }
 }

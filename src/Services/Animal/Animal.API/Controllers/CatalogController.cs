@@ -7,9 +7,9 @@ namespace Animal.API.Controllers;
 [ApiController]
 public class CatalogController : ControllerBase
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<Catalog> _logger;
 
-    public CatalogController(ILogger logger)
+    public CatalogController(ILogger<Catalog> logger)
     {
         _logger = logger;
     }

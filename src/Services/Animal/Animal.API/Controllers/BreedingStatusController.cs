@@ -7,9 +7,9 @@ namespace Animal.API.Controllers;
 [ApiController]
 public class BreedingStatusController : ControllerBase
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<BreedingStatus> _logger;
 
-    public BreedingStatusController(ILogger logger)
+    public BreedingStatusController(ILogger<BreedingStatus> logger)
     {
         _logger = logger;
     }

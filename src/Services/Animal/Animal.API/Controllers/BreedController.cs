@@ -12,10 +12,10 @@ namespace Animal.API.Controllers;
 public class BreedController : ControllerBase
 {
     private readonly IBreedRepository _breedRepository;
-    private readonly ILogger _logger;
+    private readonly ILogger<Breed> _logger;
     private readonly IMapper _mapper;
 
-    public BreedController(IBreedRepository breedRepository, ILogger logger, IMapper mapper)
+    public BreedController(IBreedRepository breedRepository, ILogger<Breed> logger, IMapper mapper)
     {
         _breedRepository = breedRepository;
         _logger = logger;
