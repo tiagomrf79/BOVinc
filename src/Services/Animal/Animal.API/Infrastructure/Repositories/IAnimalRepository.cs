@@ -11,12 +11,12 @@ namespace Animal.API.Infrastructure.Repositories
         Task<IEnumerable<FarmAnimal>> GetDescendantsSortedByAge(FarmAnimal parent);
         IQueryable<FarmAnimal> GetPossibleDams(DateOnly offspringDateOfBirth);
         IQueryable<FarmAnimal> GetPossibleSires(DateOnly offspringDateOfBirth);
-        IQueryable<AnimalDto> QueryAnimals();
-        IQueryable<BullDto> QueryBulls();
-        IQueryable<CalfDto> QueryCalves();
-        IQueryable<DryCowDto> QueryDryCows();
-        IQueryable<HeiferDto> QueryHeifers();
-        IQueryable<MilkingCowDto> QueryMilkingCows();
+        Task<IEnumerable<AnimalDto>> QueryAnimals();
+        Task<IEnumerable<BullDto>> QueryBulls();
+        Task<IEnumerable<CalfDto>> QueryCalves();
+        Task<IEnumerable<DryCowDto>> QueryDryCows();
+        Task<IEnumerable<HeiferDto>> QueryHeifers();
+        Task<IEnumerable<MilkingCowDto>> QueryMilkingCows();
         void UpdateAnimal(FarmAnimal animal);
     }
 }

@@ -155,8 +155,9 @@ public class AnimalController : ControllerBase
     {
         _logger.LogInformation("Begin call to {MethodName}", nameof(GetAnimals));
 
-        IQueryable<AnimalDto> query = _animalRepository.QueryAnimals();
-        TableResponseDto<AnimalDto> dtoToReturn = await CreateResponseDto(query, searchQuery);
+        var results = await _animalRepository.QueryAnimals();
+        var query = results.AsQueryable();
+        TableResponseDto<AnimalDto> dtoToReturn = CreateResponseDto(query, searchQuery);
 
         _logger.LogInformation("Returning {count} animals.", dtoToReturn.TotalCount);
 
@@ -168,8 +169,9 @@ public class AnimalController : ControllerBase
     {
         _logger.LogInformation("Begin call to {MethodName}", nameof(GetHeifers));
 
-        IQueryable<CalfDto> query = _animalRepository.QueryCalves();
-        TableResponseDto<CalfDto> dtoToReturn = await CreateResponseDto(query, searchQuery);
+        var results = await _animalRepository.QueryCalves();
+        var query = results.AsQueryable();
+        TableResponseDto<CalfDto> dtoToReturn = CreateResponseDto(query, searchQuery);
 
         _logger.LogInformation("Returning {count} calves.", dtoToReturn.TotalCount);
 
@@ -181,8 +183,9 @@ public class AnimalController : ControllerBase
     {
         _logger.LogInformation("Begin call to {MethodName}", nameof(GetHeifers));
 
-        IQueryable<HeiferDto> query = _animalRepository.QueryHeifers();
-        TableResponseDto<HeiferDto> dtoToReturn = await CreateResponseDto(query, searchQuery);
+        var results = await _animalRepository.QueryHeifers();
+        var query = results.AsQueryable();
+        TableResponseDto<HeiferDto> dtoToReturn = CreateResponseDto(query, searchQuery);
 
         _logger.LogInformation("Returning {count} heifers.", dtoToReturn.TotalCount);
 
@@ -194,8 +197,9 @@ public class AnimalController : ControllerBase
     {
         _logger.LogInformation("Begin call to {MethodName}", nameof(GetMilkingCows));
 
-        IQueryable<MilkingCowDto> query = _animalRepository.QueryMilkingCows();
-        TableResponseDto<MilkingCowDto> dtoToReturn = await CreateResponseDto(query, searchQuery);
+        var results = await _animalRepository.QueryMilkingCows();
+        var query = results.AsQueryable();
+        TableResponseDto<MilkingCowDto> dtoToReturn = CreateResponseDto(query, searchQuery);
 
         _logger.LogInformation("Returning {count} milking cows.", dtoToReturn.TotalCount);
 
@@ -207,8 +211,9 @@ public class AnimalController : ControllerBase
     {
         _logger.LogInformation("Begin call to {MethodName}", nameof(GetDryCows));
 
-        IQueryable<DryCowDto> query = _animalRepository.QueryDryCows();
-        TableResponseDto<DryCowDto> dtoToReturn = await CreateResponseDto(query, searchQuery);
+        var results = await _animalRepository.QueryDryCows();
+        var query = results.AsQueryable();
+        TableResponseDto<DryCowDto> dtoToReturn = CreateResponseDto(query, searchQuery);
 
         _logger.LogInformation("Returning {count} dry cows.", dtoToReturn.TotalCount);
 
@@ -220,8 +225,9 @@ public class AnimalController : ControllerBase
     {
         _logger.LogInformation("Begin call to {MethodName}", nameof(GetBulls));
 
-        IQueryable<BullDto> query = _animalRepository.QueryBulls();
-        TableResponseDto<BullDto> dtoToReturn = await CreateResponseDto(query, searchQuery);
+        var results = await _animalRepository.QueryBulls();
+        var query = results.AsQueryable();
+        TableResponseDto<BullDto> dtoToReturn = CreateResponseDto(query, searchQuery);
 
         _logger.LogInformation("Returning {count} bulls.", dtoToReturn.TotalCount);
 
@@ -396,17 +402,18 @@ public class AnimalController : ControllerBase
 
     }
 
-    private async Task<TableResponseDto<T>> CreateResponseDto<T>(IQueryable<T> query, AnimalQueryDto<T> searchQuery)
+    private TableResponseDto<T> CreateResponseDto<T>(IQueryable<T> query, AnimalQueryDto<T> searchQuery)
     {
         query = FilterQuery(query, searchQuery);
 
         int totalCount = query.Count();
 
-        var listToReturn = await query
+        var listToReturn = query
+            .AsQueryable()
             .OrderBy($"{searchQuery.SortAttribute} {searchQuery.SortDirection}")
             .Skip(searchQuery.StartIndex)
             .Take(searchQuery.MaxRecords)
-            .ToListAsync();
+            .ToList();
 
         var dtoToReturn = new TableResponseDto<T>()
         {

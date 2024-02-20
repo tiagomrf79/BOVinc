@@ -60,9 +60,9 @@ public class AnimalRepository : IAnimalRepository
         return list;
     }
 
-    public IQueryable<AnimalDto> QueryAnimals()
+    public async Task<IEnumerable<AnimalDto>> QueryAnimals()
     {
-        return _context.FarmAnimals
+        return await _context.FarmAnimals
             .Where(x => x.Category != null)
             .Select(x => new AnimalDto(
                 x.Id,
@@ -75,18 +75,19 @@ public class AnimalRepository : IAnimalRepository
                 x.Breed.Name,
                 x.Category!.Id,
                 x.Category!.Name
-            ));
+            ))
+            .ToListAsync();
     }
 
-    public IQueryable<CalfDto> QueryCalves()
+    public async Task<IEnumerable<CalfDto>> QueryCalves()
     {
-        return _context.FarmAnimals
+        return await _context.FarmAnimals
             .Where(x => x.Category == Category.Calf)
             .Select(x => new CalfDto(
                 x.Id,
                 x.RegistrationId,
                 x.DateOfBirth.GetValueOrDefault(),
-                x.Sex.Id,
+                x.SexId,
                 x.Sex.Name,
                 x.Breed.Id,
                 x.Breed.Name,
@@ -94,12 +95,12 @@ public class AnimalRepository : IAnimalRepository
                 x.Dam != null ? x.Dam.Name : "",
                 x.Sire != null ? x.Sire.Id : null,
                 x.Sire != null ? x.Sire.Name : ""
-            ));
+            )).ToListAsync();
     }
 
-    public IQueryable<HeiferDto> QueryHeifers()
+    public async Task<IEnumerable<HeiferDto>> QueryHeifers()
     {
-        return (
+        return await (
             from a in _context.FarmAnimals
             where a.Category == Category.Heifer
             join b in _context.AnimalStatus on a equals b.Animal into gj
@@ -113,10 +114,10 @@ public class AnimalRepository : IAnimalRepository
                 res.LastBreedingDate,
                 res.DueDateForCalving
             )
-        );
+        ).ToListAsync();
     }
 
-    public IQueryable<MilkingCowDto> QueryMilkingCows()
+    public async Task<IEnumerable<MilkingCowDto>> QueryMilkingCows()
     {
         var lastLactationsPerAnimal = (
             from element in _context.Lactations
@@ -125,7 +126,7 @@ public class AnimalRepository : IAnimalRepository
             select groups.OrderByDescending(g => g.CalvingDate).First()
         );
 
-        return (
+        return await (
             from a in _context.FarmAnimals
             where a.Category == Category.MilkingCow
             join b in lastLactationsPerAnimal on a equals b.FarmAnimal
@@ -142,39 +143,42 @@ public class AnimalRepository : IAnimalRepository
                 res.LastBreedingDate,
                 res.DueDateForCalving
             )
-        );
+        ).ToListAsync();
     }
 
-    public IQueryable<DryCowDto> QueryDryCows()
+    public async Task<IEnumerable<DryCowDto>> QueryDryCows()
     {
         var lastLactationsPerAnimal = (
             from element in _context.Lactations
-            group element by element.FarmAnimal
+            group element by element.FarmAnimalId
                 into groups
             select groups.OrderByDescending(g => g.CalvingDate).First()
-        );
+        ).ToList();
 
-        return (
-            from a in _context.FarmAnimals
-            where a.Category == Category.DryCow
-            join b in lastLactationsPerAnimal on a equals b.FarmAnimal
-            join c in _context.AnimalStatus on a equals c.Animal into gjc
+        //check https://dotnettutorials.net/lesson/linq-join-with-multiple-data-sources/
+
+        var result = await (
+            from animal in _context.FarmAnimals
+            where animal.Category == Category.DryCow
+            join lactation in lastLactationsPerAnimal on animal.Id equals lactation.FarmAnimalId
+            join c in _context.AnimalStatus on animal equals c.Animal into gjc
             from res in gjc.DefaultIfEmpty()
             select new DryCowDto(
-                a.Id,
-                a.RegistrationId,
-                a.Name,
-                b.LactationNumber,
+                animal.Id,
+                animal.RegistrationId,
+                animal.Name,
+                0,
                 res.LastBreedingBull,
                 res.LastDryDate.GetValueOrDefault(),
                 res.DueDateForCalving.GetValueOrDefault()
-            )
-        );
+            )).ToListAsync();
+
+        return result;
     }
 
-    public IQueryable<BullDto> QueryBulls()
+    public async Task<IEnumerable<BullDto>> QueryBulls()
     {
-        return _context.FarmAnimals
+        return await _context.FarmAnimals
             .Where(x => x.Category == Category.Bull)
             .Select(x => new BullDto(
                 x.Id,
@@ -183,7 +187,7 @@ public class AnimalRepository : IAnimalRepository
                 x.DateOfBirth.GetValueOrDefault(),
                 x.Breed.Id,
                 x.Breed.Name
-            ));
+            )).ToListAsync();
     }
 
     public IQueryable<FarmAnimal> GetPossibleDams(DateOnly offspringDateOfBirth)
