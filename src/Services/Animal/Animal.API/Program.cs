@@ -90,6 +90,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseSerilogRequestLogging();
+//app.UseSerilogRequestLogging();
 
 app.Run();

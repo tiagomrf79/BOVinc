@@ -11,7 +11,7 @@ public class LactationConfiguration : IEntityTypeConfiguration<Lactation>
         builder.ToTable("Lactation");
 
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).IsRequired();
+        builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
 
         builder.Property(x => x.LactationNumber).IsRequired();
 

@@ -7,6 +7,7 @@ namespace Animal.API.Infrastructure.Repositories
     {
         Task CommitChangesAsync();
         Task<FarmAnimal?> GetAnimalByIdAsync(int id);
+        Task<FarmAnimal?> GetAnimalByIdWithParents(int id);
         Task<FarmAnimal?> GetAnimalByRegistrationIdAsync(string registrationId);
         Task<IEnumerable<FarmAnimal>> GetDescendantsSortedByAge(FarmAnimal parent);
         IQueryable<FarmAnimal> GetPossibleDams(DateOnly offspringDateOfBirth);

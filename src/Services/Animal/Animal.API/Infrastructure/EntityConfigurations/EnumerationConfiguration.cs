@@ -13,7 +13,8 @@ public class EnumerationConfiguration<T> : IEntityTypeConfiguration<T> where T :
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .IsRequired();
+            .IsRequired()
+            .ValueGeneratedNever();
 
         builder.Property(x => x.Name)
             .HasColumnName(typeof(T).Name)

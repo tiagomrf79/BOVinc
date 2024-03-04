@@ -3,24 +3,21 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Animal.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class CreateV3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateSequence(
-                name: "animal_hilo",
-                incrementBy: 10);
-
             migrationBuilder.CreateTable(
                 name: "Breed",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     GestationLength = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -35,8 +32,7 @@ namespace Animal.API.Migrations
                 name: "BreedingStatus",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     BreedingStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -48,8 +44,7 @@ namespace Animal.API.Migrations
                 name: "Catalog",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Catalog = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -61,8 +56,7 @@ namespace Animal.API.Migrations
                 name: "Category",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Category = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -74,8 +68,7 @@ namespace Animal.API.Migrations
                 name: "MilkingStatus",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     MilkingStatus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -87,8 +80,7 @@ namespace Animal.API.Migrations
                 name: "Purpose",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Purpose = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -100,8 +92,7 @@ namespace Animal.API.Migrations
                 name: "Sex",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Sex = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -180,6 +171,7 @@ namespace Animal.API.Migrations
                 name: "AnimalStatus",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false),
                     AnimalId = table.Column<int>(type: "int", nullable: false),
                     CurrentGroupName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     DateLeftHerd = table.Column<DateTime>(type: "date", nullable: true),
@@ -193,10 +185,13 @@ namespace Animal.API.Migrations
                     ExpectedHeatDate = table.Column<DateTime>(type: "date", nullable: true),
                     LastBreedingDate = table.Column<DateTime>(type: "date", nullable: true),
                     LastBreedingBull = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    DueDateForCalving = table.Column<DateTime>(type: "date", nullable: true)
+                    DueDateForCalving = table.Column<DateTime>(type: "date", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastUpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
+                    table.PrimaryKey("PK_AnimalStatus", x => x.Id);
                     table.ForeignKey(
                         name: "FK_AnimalStatus_Animal_AnimalId",
                         column: x => x.AnimalId,
@@ -219,8 +214,7 @@ namespace Animal.API.Migrations
                 name: "Lactation",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     LactationNumber = table.Column<int>(type: "int", nullable: false),
                     CalvingDate = table.Column<DateTime>(type: "date", nullable: false),
                     EndDate = table.Column<DateTime>(type: "date", nullable: true),
@@ -237,6 +231,70 @@ namespace Animal.API.Migrations
                         principalTable: "Animal",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "BreedingStatus",
+                columns: new[] { "Id", "BreedingStatus" },
+                values: new object[,]
+                {
+                    { 1, "Open" },
+                    { 2, "Bred" },
+                    { 3, "Confirmed" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Catalog",
+                columns: new[] { "Id", "Catalog" },
+                values: new object[,]
+                {
+                    { 1, "Initial inventory" },
+                    { 2, "Historic record" },
+                    { 3, "Calving" },
+                    { 4, "Transfer" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Category",
+                columns: new[] { "Id", "Category" },
+                values: new object[,]
+                {
+                    { 1, "Calf" },
+                    { 2, "Heifer" },
+                    { 3, "Milking Cow" },
+                    { 4, "Dry Cow" },
+                    { 5, "Bull" },
+                    { 6, "Steer" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "MilkingStatus",
+                columns: new[] { "Id", "MilkingStatus" },
+                values: new object[,]
+                {
+                    { 1, "Milking" },
+                    { 2, "Dry" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Purpose",
+                columns: new[] { "Id", "Purpose" },
+                values: new object[,]
+                {
+                    { 1, "Breeding" },
+                    { 2, "Milk" },
+                    { 3, "Meat" },
+                    { 4, "To cull" },
+                    { 5, "To sell" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Sex",
+                columns: new[] { "Id", "Sex" },
+                values: new object[,]
+                {
+                    { 1, "Female" },
+                    { 2, "Male" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -328,9 +386,6 @@ namespace Animal.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Sex");
-
-            migrationBuilder.DropSequence(
-                name: "animal_hilo");
         }
     }
 }

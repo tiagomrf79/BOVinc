@@ -3,6 +3,7 @@ using Animal.API.Enums;
 using Animal.API.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
+using System.Net.WebSockets;
 
 namespace Animal.API.Infrastructure.Repositories;
 
@@ -50,9 +51,9 @@ public class AnimalRepository : IAnimalRepository
         IEnumerable<FarmAnimal> list = Enumerable.Empty<FarmAnimal>();
         IQueryable<FarmAnimal> query = _context.FarmAnimals;
 
-        if (parent.Sex == Sex.Male)
+        if (parent.SexId == Sex.Male.Id)
             query = query.Where(x => x.Sire == parent);
-        else if (parent.Sex == Sex.Female)
+        else if (parent.SexId == Sex.Female.Id)
             query = query.Where(x => x.Dam == parent);
 
         list = await query.OrderByDescending(x => x.DateOfBirth).ToListAsync();
@@ -126,24 +127,40 @@ public class AnimalRepository : IAnimalRepository
             select groups.OrderByDescending(g => g.CalvingDate).First()
         );
 
-        return await (
-            from a in _context.FarmAnimals
-            where a.Category == Category.MilkingCow
-            join b in lastLactationsPerAnimal on a equals b.FarmAnimal
-            join c in _context.AnimalStatus on a equals c.Animal into gjc
-            from res in gjc.DefaultIfEmpty()
-            select new MilkingCowDto(
+        var milkingCows = (
+            from animal in _context.FarmAnimals
+            where animal.CategoryId == Category.MilkingCow.Id
+            join status in _context.AnimalStatus on animal.Id equals status.AnimalId into gj
+            from subgroup in gj.DefaultIfEmpty()
+            select new
+            {
+                animal.Id,
+                animal.RegistrationId,
+                animal.Name,
+                subgroup.LastCalvingDate,
+                subgroup.BreedingStatusId,
+                BreedingStatusName = subgroup.BreedingStatus!.Name,
+                subgroup.LastBreedingDate,
+                subgroup.DueDateForCalving
+            }).ToList();
+
+        var result = (
+            from a in milkingCows
+            join b in lastLactationsPerAnimal on a.Id equals b.FarmAnimalId
+            select new MilkingCowDto
+            (
                 a.Id,
                 a.RegistrationId,
                 a.Name,
                 b.LactationNumber,
-                res.LastCalvingDate.GetValueOrDefault(),
-                res.BreedingStatus != null ? res.BreedingStatus.Id : BreedingStatus.Open.Id,
-                res.BreedingStatus != null ? res.BreedingStatus.Name : BreedingStatus.Open.Name,
-                res.LastBreedingDate,
-                res.DueDateForCalving
-            )
-        ).ToListAsync();
+                (DateOnly)a.LastCalvingDate!,
+                (int)a.BreedingStatusId!,
+                a.BreedingStatusName,
+                a.LastBreedingDate,
+                a.DueDateForCalving
+            )).ToList();
+
+        return result;
     }
 
     public async Task<IEnumerable<DryCowDto>> QueryDryCows()
@@ -155,24 +172,35 @@ public class AnimalRepository : IAnimalRepository
             select groups.OrderByDescending(g => g.CalvingDate).First()
         ).ToList();
 
-        //check https://dotnettutorials.net/lesson/linq-join-with-multiple-data-sources/
-
-        var result = await (
+        var dryCows = (
             from animal in _context.FarmAnimals
-            where animal.Category == Category.DryCow
-            join lactation in lastLactationsPerAnimal on animal.Id equals lactation.FarmAnimalId
-            join c in _context.AnimalStatus on animal equals c.Animal into gjc
-            from res in gjc.DefaultIfEmpty()
-            select new DryCowDto(
+            where animal.CategoryId == Category.DryCow.Id
+            join status in _context.AnimalStatus on animal.Id equals status.AnimalId into gj
+            from subgroup in gj.DefaultIfEmpty()
+            select new
+            {
                 animal.Id,
                 animal.RegistrationId,
                 animal.Name,
-                0,
-                res.LastBreedingBull,
-                res.LastDryDate.GetValueOrDefault(),
-                res.DueDateForCalving.GetValueOrDefault()
-            )).ToListAsync();
+                subgroup.LastBreedingBull,
+                subgroup.LastDryDate,
+                subgroup.DueDateForCalving
+            }).ToList();
 
+        var result = (
+            from a in dryCows
+            join b in lastLactationsPerAnimal on a.Id equals b.FarmAnimalId
+            select new DryCowDto
+            (
+                a.Id,
+                a.RegistrationId,
+                a.Name,
+                b.LactationNumber,
+                a.LastBreedingBull,
+                a.LastDryDate.GetValueOrDefault(),
+                a.DueDateForCalving.GetValueOrDefault()
+            )).ToList();
+        
         return result;
     }
 
@@ -190,13 +218,26 @@ public class AnimalRepository : IAnimalRepository
             )).ToListAsync();
     }
 
+    public async Task<FarmAnimal?> GetAnimalByIdWithParents(int id)
+    {
+        return await _context.FarmAnimals
+            .Where(x => x.Id == id)
+            .Include(x => x.Dam)
+            .Include(x => x.Dam != null ? x.Dam.Dam : null)
+            .Include(x => x.Dam != null ? x.Dam.Sire : null)
+            .Include(x => x.Sire)
+            .Include(x => x.Sire != null ? x.Sire.Dam : null)
+            .Include(x => x.Sire != null ? x.Sire.Sire : null)
+            .FirstOrDefaultAsync();
+    }
+
     public IQueryable<FarmAnimal> GetPossibleDams(DateOnly offspringDateOfBirth)
     {
         return _context.FarmAnimals
             .Where(x =>
                 x.Sex == Sex.Female
-                && x.DateOfBirth < offspringDateOfBirth.AddMonths(18)
-                && x.DateOfBirth > offspringDateOfBirth.AddYears(20));
+                && x.DateOfBirth < offspringDateOfBirth.AddMonths(-18)
+                && x.DateOfBirth > offspringDateOfBirth.AddYears(-20));
     }
 
     public IQueryable<FarmAnimal> GetPossibleSires(DateOnly offspringDateOfBirth)
@@ -204,7 +245,7 @@ public class AnimalRepository : IAnimalRepository
         return _context.FarmAnimals
             .Where(x =>
                 x.Sex == Sex.Male
-                && x.DateOfBirth < offspringDateOfBirth.AddMonths(12)
-                && x.DateOfBirth > offspringDateOfBirth.AddYears(20));
+                && x.DateOfBirth < offspringDateOfBirth.AddMonths(-12)
+                && x.DateOfBirth > offspringDateOfBirth.AddYears(-20));
     }
 }

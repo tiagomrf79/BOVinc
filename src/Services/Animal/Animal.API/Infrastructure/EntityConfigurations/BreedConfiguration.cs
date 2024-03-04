@@ -11,7 +11,7 @@ public class BreedConfiguration : IEntityTypeConfiguration<Breed>
         builder.ToTable("Breed");
 
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).IsRequired();
+        builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
 
         builder.Property(x => x.Name).IsRequired().HasMaxLength(50);
 

@@ -11,7 +11,7 @@ public class AnimalStatusConfiguration : IEntityTypeConfiguration<AnimalStatus>
         builder.ToTable("AnimalStatus");
 
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).IsRequired();
+        builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
 
         builder.HasOne(x => x.Animal).WithOne().HasForeignKey<AnimalStatus>(x => x.AnimalId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 

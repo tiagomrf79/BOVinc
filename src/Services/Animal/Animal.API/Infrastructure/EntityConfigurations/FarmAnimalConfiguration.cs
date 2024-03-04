@@ -11,7 +11,7 @@ public class FarmAnimalConfiguration : IEntityTypeConfiguration<FarmAnimal>
         builder.ToTable("Animal");
 
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).IsRequired().UseHiLo("animal_hilo");
+        builder.Property(x => x.Id).IsRequired().ValueGeneratedNever();
 
         builder.Property(x => x.RegistrationId).HasMaxLength(50);
 

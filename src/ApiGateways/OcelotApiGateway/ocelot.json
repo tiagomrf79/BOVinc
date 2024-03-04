@@ -1,0 +1,79 @@
+{
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:5003"
+  },
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/gateway/breed",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/breed",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7250
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/gateway/breed/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/breed/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7250
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/gateway/breed",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/breed",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7250
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/gateway/breed",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/breed",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7250
+        }
+      ],
+      "Key": "BreedAgg"
+    },
+    {
+      "UpstreamPathTemplate": "/gateway/animal",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/animal",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7250
+        }
+      ],
+      "Key": "AnimalAgg"
+    }
+  ],
+  "Aggregates": [
+    {
+      "UpstreamPathTemplate": "/gateway/testes",
+      "RouteKeys": [
+        "BreedAgg",
+        "AnimalAgg"
+      ],
+      "Aggregator": "TestAggregator"
+    }
+  ]
+}

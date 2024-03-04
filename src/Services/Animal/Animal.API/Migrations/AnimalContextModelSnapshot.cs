@@ -22,16 +22,10 @@ namespace Animal.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.HasSequence("animal_hilo")
-                .IncrementsBy(10);
-
             modelBuilder.Entity("Animal.API.Enums.BreedingStatus", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -64,10 +58,7 @@ namespace Animal.API.Migrations
             modelBuilder.Entity("Animal.API.Enums.Catalog", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -105,10 +96,7 @@ namespace Animal.API.Migrations
             modelBuilder.Entity("Animal.API.Enums.Category", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -156,10 +144,7 @@ namespace Animal.API.Migrations
             modelBuilder.Entity("Animal.API.Enums.MilkingStatus", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -187,10 +172,7 @@ namespace Animal.API.Migrations
             modelBuilder.Entity("Animal.API.Enums.Purpose", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -233,10 +215,7 @@ namespace Animal.API.Migrations
             modelBuilder.Entity("Animal.API.Enums.Sex", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -264,10 +243,7 @@ namespace Animal.API.Migrations
             modelBuilder.Entity("Animal.API.Models.AnimalStatus", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AnimalId")
                         .HasColumnType("int");
@@ -335,10 +311,7 @@ namespace Animal.API.Migrations
             modelBuilder.Entity("Animal.API.Models.Breed", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -362,10 +335,7 @@ namespace Animal.API.Migrations
             modelBuilder.Entity("Animal.API.Models.FarmAnimal", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseHiLo(b.Property<int>("Id"), "animal_hilo");
 
                     b.Property<int>("BreedId")
                         .HasColumnType("int");
@@ -434,10 +404,7 @@ namespace Animal.API.Migrations
             modelBuilder.Entity("Animal.API.Models.Lactation", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CalvingDate")
                         .HasColumnType("date");
@@ -448,8 +415,7 @@ namespace Animal.API.Migrations
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("date");
 
-                    b.Property<int?>("FarmAnimalId")
-                        .IsRequired()
+                    b.Property<int>("FarmAnimalId")
                         .HasColumnType("int");
 
                     b.Property<int>("LactationNumber")

@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Linq.Dynamic.Core;
 
 namespace Animal.API.Controllers;
@@ -139,7 +140,7 @@ public class AnimalController : ControllerBase
         }
 
         int lastLactationNumber = 0;
-        if (Enumeration.FromValue<Sex>(searchResult.SexId) == Sex.Female)
+        if (searchResult.SexId == Sex.Female.Id)
         {
             IEnumerable<Lactation> lactations = await _lactationRepository.GetLactationsAsync(id);
             lastLactationNumber = lactations.Last().LactationNumber;
@@ -279,7 +280,7 @@ public class AnimalController : ControllerBase
             "Begin call to {MethodName} for getting ascendants for animal {id}",
             nameof(GetAscendants), animalId);
 
-        FarmAnimal? offspring = await _animalRepository.GetAnimalByIdAsync(animalId);
+        FarmAnimal? offspring = await _animalRepository.GetAnimalByIdWithParents(animalId);
 
         //exit if offspring is not found
         if (offspring == null)
@@ -295,7 +296,8 @@ public class AnimalController : ControllerBase
             return NotFound(problemDetails);
         }
 
-        return CreateAscendantFromAnimal(offspring, 0);
+        AscendantDto ascendantDto = CreateAscendantFromAnimal(offspring, 0);
+        return ascendantDto;
     }
 
     [HttpGet("Dams")]
@@ -490,7 +492,7 @@ public class AnimalController : ControllerBase
         return query;
     }
 
-    private string CreateLabelForAnimal(FarmAnimal animal)
+    private static string CreateLabelForAnimal(FarmAnimal animal)
     {
         string label = "";
 
@@ -508,15 +510,15 @@ public class AnimalController : ControllerBase
     {
         string animalLabel = CreateLabelForAnimal(animal);
         int sexId = animal.SexId;
-        IEnumerable<AscendantDto> parents = Enumerable.Empty<AscendantDto>();
+        List<AscendantDto> parents = new List<AscendantDto>();
 
         if (level <= 2)
         {
             if (animal.Dam != null)
-                parents.Append(CreateAscendantFromAnimal(animal.Dam, level + 1));
+                parents.Add(CreateAscendantFromAnimal(animal.Dam, level + 1));
 
             if (animal.Sire != null)
-                parents.Append(CreateAscendantFromAnimal(animal.Sire, level + 1));
+                parents.Add(CreateAscendantFromAnimal(animal.Sire, level + 1));
         }
 
         AscendantDto ascendantDto = new AscendantDto(animalLabel, sexId, parents);
